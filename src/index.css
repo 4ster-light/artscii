@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+@theme {
+	--color-base: var(--base);
+	--color-mantle: var(--mantle);
+	--color-crust: var(--crust);
+	--color-text: var(--text);
+	--color-subtext1: var(--subtext1);
+	--color-subtext0: var(--subtext0);
+	--color-overlay2: var(--overlay2);
+	--color-overlay1: var(--overlay1);
+	--color-overlay0: var(--overlay0);
+	--color-surface2: var(--surface2);
+	--color-surface1: var(--surface1);
+	--color-surface0: var(--surface0);
+	--color-rosewater: var(--rosewater);
+	--color-flamingo: var(--flamingo);
+	--color-pink: var(--pink);
+	--color-mauve: var(--mauve);
+	--color-red: var(--red);
+	--color-maroon: var(--maroon);
+	--color-peach: var(--peach);
+	--color-yellow: var(--yellow);
+	--color-green: var(--green);
+	--color-teal: var(--teal);
+	--color-sky: var(--sky);
+	--color-sapphire: var(--sapphire);
+	--color-blue: var(--blue);
+	--color-lavender: var(--lavender);
+}
+
+:root {
+	--base: #1e1e2e;
+	--mantle: #181825;
+	--crust: #11111b;
+
+	--text: #cdd6f4;
+	--subtext1: #bac2de;
+	--subtext0: #a6adc8;
+
+	--overlay2: #9399b2;
+	--overlay1: #7f849c;
+	--overlay0: #6c7086;
+
+	--surface2: #585b70;
+	--surface1: #45475a;
+	--surface0: #313244;
+
+	--rosewater: #f5e0dc;
+	--flamingo: #f2cdcd;
+	--pink: #f5c2e7;
+	--mauve: #cba6f7;
+	--red: #f38ba8;
+	--maroon: #eba0ac;
+	--peach: #fab387;
+	--yellow: #f9e2af;
+	--green: #a6e3a1;
+	--teal: #94e2d5;
+	--sky: #89dceb;
+	--sapphire: #74c7ec;
+	--blue: #89b4fa;
+	--lavender: #b4befe;
+}
+
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+}
+
+body {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	background-color: var(--base);
+	color: var(--text);
+	margin: 0;
+	padding: 0;
+	min-height: 100vh;
+}
+
+.ascii-output {
+	font-family: monospace;
+	white-space: pre;
+	line-height: 1;
+	font-size: 10px;
+	overflow: auto;
+}
+
+@media (max-width: 768px) {
+	.ascii-output {
+		font-size: 5px;
+	}
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--surface0);
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--overlay0);
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--overlay1);
+}
+
+/* Catppuccin button styles */
+.btn {
+	@apply px-4 py-2 rounded-md font-medium transition-colors;
+	background-color: var(--surface1);
+	color: var(--text);
+	border: 1px solid var(--surface2);
+}
+
+.btn:hover {
+	background-color: var(--surface2);
+}
+
+.btn-primary {
+	background-color: var(--mauve);
+	color: var(--crust);
+	border: none;
+}
+
+.btn-primary:hover {
+	background-color: var(--lavender);
+}
+
+/* Input styles */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 8px;
+	background: var(--surface0);
+	border-radius: 4px;
+	outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	background: var(--mauve);
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	background: var(--mauve);
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+/* Card styles */
+.card {
+	background-color: var(--mantle);
+	border-radius: 8px;
+	border: 1px solid var(--surface0);
+}
