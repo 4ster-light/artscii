@@ -37,7 +37,7 @@ export const processImage = (
 		img.onload = () => {
 			try {
 				const width = Math.floor(img.width * resolution);
-				const height = Math.floor(img.height * resolution * 0.5); // Adjust for character aspect ratio
+				const height = Math.floor(img.height * resolution * 0.5);
 
 				const canvas = createCanvas(width, height);
 				const ctx = canvas.getContext("2d");
@@ -56,18 +56,21 @@ export const processImage = (
 				const charCount = chars.length - 1;
 
 				let result = "";
-
 				for (let y = 0; y < height; y++) {
 					for (let x = 0; x < width; x++) {
 						const idx = (y * width + x) * 4;
 
-						const [r, g, b] = [0, 1, 2].map(i => adjustPixel(pixels[idx + i], contrast, brightness));
+						const [r, g, b] = [0, 1, 2].map((i) =>
+							adjustPixel(pixels[idx + i], contrast, brightness),
+						);
 
 						const pixelBrightness = getPixelBrightness(r, g, b);
 						const charIndex = Math.floor((pixelBrightness / 255) * charCount);
 						const char = chars[charIndex];
 
-						result += colored ? `<span style="color: rgb(${r},${g},${b})">${char}</span>` : char;
+						result += colored
+							? `<span style="color: rgb(${r},${g},${b})">${char}</span>`
+							: char;
 					}
 					result += colored ? "<br>" : "\n";
 				}
