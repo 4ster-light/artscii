@@ -57,40 +57,19 @@ export const processImage = (
 
 				let result = "";
 
-				if (colored) {
-					for (let y = 0; y < height; y++) {
-						for (let x = 0; x < width; x++) {
-							const idx = (y * width + x) * 4;
+				for (let y = 0; y < height; y++) {
+					for (let x = 0; x < width; x++) {
+						const idx = (y * width + x) * 4;
 
-							const r = adjustPixel(pixels[idx], contrast, brightness);
-							const g = adjustPixel(pixels[idx + 1], contrast, brightness);
-							const b = adjustPixel(pixels[idx + 2], contrast, brightness);
+						const [r, g, b] = [0, 1, 2].map(i => adjustPixel(pixels[idx + i], contrast, brightness));
 
-							// Calculate brightness and map to ASCII character
-							const pixelBrightness = getPixelBrightness(r, g, b);
-							const charIndex = Math.floor((pixelBrightness / 255) * charCount);
-							const char = chars[charIndex];
+						const pixelBrightness = getPixelBrightness(r, g, b);
+						const charIndex = Math.floor((pixelBrightness / 255) * charCount);
+						const char = chars[charIndex];
 
-							result += `<span style="color: rgb(${r},${g},${b})">${char}</span>`;
-						}
-						result += "<br>"; // Add line break
+						result += colored ? `<span style="color: rgb(${r},${g},${b})">${char}</span>` : char;
 					}
-				} else {
-					for (let y = 0; y < height; y++) {
-						for (let x = 0; x < width; x++) {
-							const idx = (y * width + x) * 4;
-
-							const r = adjustPixel(pixels[idx], contrast, brightness);
-							const g = adjustPixel(pixels[idx + 1], contrast, brightness);
-							const b = adjustPixel(pixels[idx + 2], contrast, brightness);
-
-							const pixelBrightness = getPixelBrightness(r, g, b);
-							const charIndex = Math.floor((pixelBrightness / 255) * charCount);
-
-							result += chars[charIndex];
-						}
-						result += "\n";
-					}
+					result += colored ? "<br>" : "\n";
 				}
 
 				resolve(result);
