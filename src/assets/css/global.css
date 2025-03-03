@@ -118,7 +118,7 @@ body {
 
 /* Catppuccin button styles */
 .btn {
-	@apply px-4 py-2 rounded-md font-medium transition-colors;
+	@apply px-4 py-2 rounded-md font-medium transition-colors hover:cursor-pointer;
 	background-color: var(--surface1);
 	color: var(--text);
 	border: 1px solid var(--surface2);

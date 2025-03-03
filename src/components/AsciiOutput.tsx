@@ -12,14 +12,11 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 	const [isFullscreen, setIsFullscreen] = useState(false);
 
 	useEffect(() => {
-		const handleResize = () => {
+		const handleResize = () =>
 			setIsFullscreen(document.fullscreenElement !== null);
-		};
 
 		document.addEventListener("fullscreenchange", handleResize);
-		return () => {
-			document.removeEventListener("fullscreenchange", handleResize);
-		};
+		return () => document.removeEventListener("fullscreenchange", handleResize);
 	}, []);
 
 	const downloadAsPng = async () => {

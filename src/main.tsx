@@ -1,4 +1,4 @@
-import "./index.css";
+import "./assets/css/global.css";
 
 import { signal } from "@preact/signals";
 import { render } from "preact";
