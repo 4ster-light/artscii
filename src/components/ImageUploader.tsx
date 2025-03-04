@@ -53,6 +53,7 @@ export function ImageUploader({ onImageUpload }: ImageUploaderProps) {
 			<div
 				className="border-2 border-dashed border-surface2 rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-mauve"
 				onClick={triggerFileInput}
+				onKeyDown={(e) => e.key === "Enter" && triggerFileInput()}
 				onDrop={handleDrop}
 				onDragOver={handleDragOver}
 			>
@@ -68,7 +69,7 @@ export function ImageUploader({ onImageUpload }: ImageUploaderProps) {
 					<div className="space-y-4">
 						<img
 							src={imageData.value}
-							alt="Uploaded image"
+							alt="Uploaded content"
 							className="max-h-48 mx-auto object-contain rounded-sm"
 						/>
 						<p className="text-subtext0">Click or drag to replace</p>

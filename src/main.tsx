@@ -22,9 +22,9 @@ export const inverted = signal<boolean>(false);
 export function App() {
 	const [isProcessing, setIsProcessing] = useState(false);
 
-	const handleImageUpload = (dataUrl: string) => {
+	const handleImageUpload = async (dataUrl: string) => {
 		imageData.value = dataUrl;
-		generateAscii();
+		await generateAscii();
 	};
 
 	const generateAscii = async () => {
@@ -32,7 +32,7 @@ export function App() {
 
 		setIsProcessing(true);
 		try {
-			const result = await processImage(
+			asciiArt.value = await processImage(
 				imageData.value,
 				resolution.value,
 				contrast.value,
@@ -40,7 +40,6 @@ export function App() {
 				inverted.value,
 				coloredAscii.value,
 			);
-			asciiArt.value = result;
 		} catch (error) {
 			console.error("Error generating ASCII art:", error);
 		} finally {

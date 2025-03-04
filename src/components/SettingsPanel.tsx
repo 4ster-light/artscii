@@ -51,13 +51,17 @@ export function SettingsPanel({
 
 			<div className="space-y-5">
 				<div>
-					<label className="flex items-center justify-between mb-2">
+					<label
+						className="flex items-center justify-between mb-2"
+						htmlFor="resolution"
+					>
 						<span className="text-subtext0">Resolution</span>
 						<span className="text-sm text-overlay1">
 							{Math.round(resolution.value * 100)}%
 						</span>
 					</label>
 					<input
+						id="resolution"
 						type="range"
 						min="0.1"
 						max="1"
@@ -73,13 +77,17 @@ export function SettingsPanel({
 				</div>
 
 				<div>
-					<label className="flex items-center justify-between mb-2">
+					<label
+						className="flex items-center justify-between mb-2"
+						htmlFor="contrast"
+					>
 						<span className="text-subtext0">Contrast</span>
 						<span className="text-sm text-overlay1">
 							{contrast.value.toFixed(1)}x
 						</span>
 					</label>
 					<input
+						id="contrast"
 						type="range"
 						min="0.5"
 						max="2"
@@ -92,13 +100,17 @@ export function SettingsPanel({
 				</div>
 
 				<div>
-					<label className="flex items-center justify-between mb-2">
+					<label
+						className="flex items-center justify-between mb-2"
+						htmlFor="brightness"
+					>
 						<span className="text-subtext0">Brightness</span>
 						<span className="text-sm text-overlay1">
 							{brightness.value.toFixed(1)}x
 						</span>
 					</label>
 					<input
+						id="brightness"
 						type="range"
 						min="0.5"
 						max="2"
@@ -124,7 +136,7 @@ export function SettingsPanel({
 						>
 							<div
 								className={`absolute w-4 h-4 rounded-full bg-text top-0.5 transition-transform ${coloredAscii.value ? "translate-x-5" : "translate-x-0.5"}`}
-							></div>
+							/>
 						</div>
 						<span className="ml-2 text-subtext0">Colored output</span>
 					</label>
@@ -144,7 +156,7 @@ export function SettingsPanel({
 						>
 							<div
 								className={`absolute w-4 h-4 rounded-full bg-text top-0.5 transition-transform ${inverted.value ? "translate-x-5" : "translate-x-0.5"}`}
-							></div>
+							/>
 						</div>
 						<span className="ml-2 text-subtext0">Invert colors</span>
 					</label>

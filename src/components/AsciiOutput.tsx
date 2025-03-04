@@ -54,7 +54,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 		URL.revokeObjectURL(url);
 	};
 
-	const toggleFullscreen = () => {
+	const toggleFullscreen = async () => {
 		if (!outputRef.current) return;
 
 		if (!document.fullscreenElement) {
@@ -62,7 +62,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 				console.error(`Error attempting to enable fullscreen: ${err.message}`);
 			});
 		} else {
-			document.exitFullscreen();
+			await document.exitFullscreen();
 		}
 	};
 
@@ -87,6 +87,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 					/>
 
 					<button
+						type="button"
 						onClick={toggleFullscreen}
 						className="btn"
 						disabled={!asciiArt.value || isProcessing}
@@ -96,6 +97,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 					</button>
 
 					<button
+						type="button"
 						onClick={downloadAsPng}
 						className="btn"
 						disabled={!asciiArt.value || isProcessing}
@@ -105,6 +107,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 					</button>
 
 					<button
+						type="button"
 						onClick={downloadAsText}
 						className="btn"
 						disabled={!asciiArt.value || isProcessing}
@@ -137,7 +140,7 @@ export function AsciiOutput({ isProcessing }: AsciiOutputProps) {
 					<div className="h-full flex flex-col items-center justify-center text-center p-6">
 						<div className="text-4xl text-mauve mb-4">@</div>
 						<p className="text-subtext0 mb-2">
-							Upload an image to generate ASCII art
+							Upload an image to generate the ASCII
 						</p>
 						<p className="text-sm text-overlay0">
 							Adjust the settings to customize the output
