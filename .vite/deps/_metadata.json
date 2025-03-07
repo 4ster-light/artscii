@@ -1,0 +1,67 @@
+{
+  "hash": "854dac3c",
+  "configHash": "09f533dc",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "6f911148",
+  "optimized": {
+    "preact": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/dist/preact.module.js",
+      "file": "preact.js",
+      "fileHash": "49c9b451",
+      "needsInterop": false
+    },
+    "preact/jsx-runtime": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js",
+      "file": "preact_jsx-runtime.js",
+      "fileHash": "15e5e886",
+      "needsInterop": false
+    },
+    "preact/jsx-dev-runtime": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js",
+      "file": "preact_jsx-dev-runtime.js",
+      "fileHash": "30fe8899",
+      "needsInterop": false
+    },
+    "preact/debug": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/debug/dist/debug.module.js",
+      "file": "preact_debug.js",
+      "fileHash": "ee0e6bb7",
+      "needsInterop": false
+    },
+    "preact/devtools": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/devtools/dist/devtools.module.js",
+      "file": "preact_devtools.js",
+      "fileHash": "dfb39a7d",
+      "needsInterop": false
+    },
+    "@preact/signals": {
+      "src": "../../node_modules/.deno/@preact+signals@1.2.2/node_modules/@preact/signals/dist/signals.module.js",
+      "file": "@preact_signals.js",
+      "fileHash": "88807771",
+      "needsInterop": false
+    },
+    "html-to-image": {
+      "src": "../../node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/index.js",
+      "file": "html-to-image.js",
+      "fileHash": "c317fad2",
+      "needsInterop": false
+    },
+    "preact/hooks": {
+      "src": "../../node_modules/.deno/preact@10.26.2/node_modules/preact/hooks/dist/hooks.module.js",
+      "file": "preact_hooks.js",
+      "fileHash": "8904b625",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-UK7WMR4E": {
+      "file": "chunk-UK7WMR4E.js"
+    },
+    "chunk-76EYESMD": {
+      "file": "chunk-76EYESMD.js"
+    },
+    "chunk-KT276D35": {
+      "file": "chunk-KT276D35.js"
+    }
+  }
+}

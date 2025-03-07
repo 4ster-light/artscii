@@ -4,12 +4,12 @@ import { signal } from "@preact/signals";
 import { render } from "preact";
 import { useState } from "preact/hooks";
 
-import { AsciiOutput } from "./components/AsciiOutput";
-import { Footer } from "./components/Footer";
-import { Header } from "./components/Header";
-import { ImageUploader } from "./components/ImageUploader";
-import { SettingsPanel } from "./components/SettingsPanel";
-import { processImage } from "./utils/asciiConverter";
+import { AsciiOutput } from "./components/AsciiOutput.tsx";
+import { Footer } from "./components/Footer.tsx";
+import { Header } from "./components/Header.tsx";
+import { ImageUploader } from "./components/ImageUploader.tsx";
+import { SettingsPanel } from "./components/SettingsPanel.tsx";
+import { processImage } from "./utils/asciiConverter.ts";
 
 export const imageData = signal<string | null>(null);
 export const asciiArt = signal<string>("");

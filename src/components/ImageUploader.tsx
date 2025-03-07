@@ -1,5 +1,5 @@
 import { useRef } from "preact/hooks";
-import { imageData } from "../main";
+import { imageData } from "../main.tsx";
 
 interface ImageUploaderProps {
 	onImageUpload: (dataUrl: string) => void;

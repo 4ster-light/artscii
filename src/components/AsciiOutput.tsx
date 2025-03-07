@@ -1,6 +1,6 @@
 import { toPng } from "html-to-image";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { asciiArt, coloredAscii } from "../main";
+import { asciiArt, coloredAscii } from "../main.tsx";
 
 interface AsciiOutputProps {
 	isProcessing: boolean;
