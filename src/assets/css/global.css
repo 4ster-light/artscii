@@ -82,12 +82,20 @@ body {
 	min-height: 100vh;
 }
 
+.ascii-container {
+	display: inline-block;
+	transform-origin: 0 0;
+}
+
 .ascii-output {
 	font-family: monospace;
 	white-space: pre;
 	line-height: 1;
 	font-size: 10px;
-	overflow: auto;
+	overflow: visible;
+	margin: 0;
+	padding: 0;
+	display: block;
 }
 
 @media (max-width: 768px) {
@@ -96,7 +104,6 @@ body {
 	}
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
 	width: 8px;
 	height: 8px;
@@ -116,7 +123,6 @@ body {
 	background: var(--overlay1);
 }
 
-/* Catppuccin button styles */
 .btn {
 	@apply px-4 py-2 rounded-md font-medium transition-colors hover:cursor-pointer;
 	background-color: var(--surface1);
@@ -138,7 +144,6 @@ body {
 	background-color: var(--lavender);
 }
 
-/* Input styles */
 input[type="range"] {
 	-webkit-appearance: none;
 	appearance: none;
@@ -167,9 +172,73 @@ input[type="range"]::-moz-range-thumb {
 	cursor: pointer;
 }
 
-/* Card styles */
 .card {
 	background-color: var(--mantle);
 	border-radius: 8px;
 	border: 1px solid var(--surface0);
+}
+
+.checkbox-input {
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid var(--surface2);
+	border-radius: 4px;
+	background-color: var(--surface0);
+	cursor: pointer;
+	position: relative;
+	transition: all 0.2s ease;
+}
+
+.checkbox-input:checked {
+	background-color: var(--mauve);
+	border-color: var(--mauve);
+}
+
+.checkbox-input:checked::after {
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 2px;
+	width: 5px;
+	height: 10px;
+	border: solid var(--base);
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.checkbox-input:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.checkbox-input:hover:not(:disabled) {
+	border-color: var(--mauve);
+}
+
+@media (max-width: 768px) {
+	.checkbox-input {
+		width: 24px;
+		height: 24px;
+	}
+
+	.checkbox-input:checked::after {
+		left: 8px;
+		top: 3px;
+		width: 6px;
+		height: 12px;
+		border-width: 0 3px 3px 0;
+	}
+}
+
+.transition-all {
+	transition-property: all;
+}
+
+.duration-300 {
+	transition-duration: 300ms;
+}
+
+.ease-in-out {
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
