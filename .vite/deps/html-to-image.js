@@ -1,4 +1,4 @@
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/util.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/util.js
 function resolveUrl(url, baseUrl) {
   if (url.match(/^[a-z]+:\/\//i)) {
     return url;
@@ -37,6 +37,18 @@ function toArray(arrayLike) {
     arr.push(arrayLike[i]);
   }
   return arr;
+}
+var styleProps = null;
+function getStyleProperties(options = {}) {
+  if (styleProps) {
+    return styleProps;
+  }
+  if (options.includeStyleProperties) {
+    styleProps = options.includeStyleProperties;
+    return styleProps;
+  }
+  styleProps = toArray(window.getComputedStyle(document.documentElement));
+  return styleProps;
 }
 function px(node, styleProperty) {
   const win = node.ownerDocument.defaultView || window;
@@ -115,8 +127,11 @@ function canvasToBlob(canvas, options = {}) {
 function createImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.decode = () => resolve(img);
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      img.decode().then(() => {
+        requestAnimationFrame(() => resolve(img));
+      });
+    };
     img.onerror = reject;
     img.crossOrigin = "anonymous";
     img.decoding = "async";
@@ -151,24 +166,24 @@ var isInstanceOfElement = (node, instance) => {
   return nodePrototype.constructor.name === instance.name || isInstanceOfElement(nodePrototype, instance);
 };
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/clone-pseudos.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/clone-pseudos.js
 function formatCSSText(style) {
   const content = style.getPropertyValue("content");
   return `${style.cssText} content: '${content.replace(/'|"/g, "")}';`;
 }
-function formatCSSProperties(style) {
-  return toArray(style).map((name) => {
+function formatCSSProperties(style, options) {
+  return getStyleProperties(options).map((name) => {
     const value = style.getPropertyValue(name);
     const priority = style.getPropertyPriority(name);
     return `${name}: ${value}${priority ? " !important" : ""};`;
   }).join(" ");
 }
-function getPseudoElementStyle(className, pseudo, style) {
+function getPseudoElementStyle(className, pseudo, style, options) {
   const selector = `.${className}:${pseudo}`;
-  const cssText = style.cssText ? formatCSSText(style) : formatCSSProperties(style);
+  const cssText = style.cssText ? formatCSSText(style) : formatCSSProperties(style, options);
   return document.createTextNode(`${selector}{${cssText}}`);
 }
-function clonePseudoElement(nativeNode, clonedNode, pseudo) {
+function clonePseudoElement(nativeNode, clonedNode, pseudo, options) {
   const style = window.getComputedStyle(nativeNode, pseudo);
   const content = style.getPropertyValue("content");
   if (content === "" || content === "none") {
@@ -181,15 +196,15 @@ function clonePseudoElement(nativeNode, clonedNode, pseudo) {
     return;
   }
   const styleElement = document.createElement("style");
-  styleElement.appendChild(getPseudoElementStyle(className, pseudo, style));
+  styleElement.appendChild(getPseudoElementStyle(className, pseudo, style, options));
   clonedNode.appendChild(styleElement);
 }
-function clonePseudoElements(nativeNode, clonedNode) {
-  clonePseudoElement(nativeNode, clonedNode, ":before");
-  clonePseudoElement(nativeNode, clonedNode, ":after");
+function clonePseudoElements(nativeNode, clonedNode, options) {
+  clonePseudoElement(nativeNode, clonedNode, ":before", options);
+  clonePseudoElement(nativeNode, clonedNode, ":after", options);
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/mimes.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/mimes.js
 var WOFF = "application/font-woff";
 var JPEG = "image/jpeg";
 var mimes = {
@@ -214,7 +229,7 @@ function getMimeType(url) {
   return mimes[extension] || "";
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/dataurl.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/dataurl.js
 function getContentFromDataUrl(dataURL) {
   return dataURL.split(/,/)[1];
 }
@@ -285,7 +300,7 @@ async function resourceToDataURL(resourceUrl, contentType, options) {
   return dataURL;
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/clone-node.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/clone-node.js
 async function cloneCanvasElement(canvas) {
   const dataURL = canvas.toDataURL();
   if (dataURL === "data:,") {
@@ -308,11 +323,11 @@ async function cloneVideoElement(video, options) {
   const dataURL = await resourceToDataURL(poster, contentType, options);
   return createImage(dataURL);
 }
-async function cloneIFrameElement(iframe) {
+async function cloneIFrameElement(iframe, options) {
   var _a;
   try {
     if ((_a = iframe === null || iframe === void 0 ? void 0 : iframe.contentDocument) === null || _a === void 0 ? void 0 : _a.body) {
-      return await cloneNode(iframe.contentDocument.body, {}, true);
+      return await cloneNode(iframe.contentDocument.body, options, true);
     }
   } catch (_b) {
   }
@@ -326,13 +341,17 @@ async function cloneSingleNode(node, options) {
     return cloneVideoElement(node, options);
   }
   if (isInstanceOfElement(node, HTMLIFrameElement)) {
-    return cloneIFrameElement(node);
+    return cloneIFrameElement(node, options);
   }
-  return node.cloneNode(false);
+  return node.cloneNode(isSVGElement(node));
 }
 var isSlotElement = (node) => node.tagName != null && node.tagName.toUpperCase() === "SLOT";
+var isSVGElement = (node) => node.tagName != null && node.tagName.toUpperCase() === "SVG";
 async function cloneChildren(nativeNode, clonedNode, options) {
   var _a, _b;
+  if (isSVGElement(clonedNode)) {
+    return clonedNode;
+  }
   let children = [];
   if (isSlotElement(nativeNode) && nativeNode.assignedNodes) {
     children = toArray(nativeNode.assignedNodes());
@@ -351,7 +370,7 @@ async function cloneChildren(nativeNode, clonedNode, options) {
   }), Promise.resolve());
   return clonedNode;
 }
-function cloneCSSStyle(nativeNode, clonedNode) {
+function cloneCSSStyle(nativeNode, clonedNode, options) {
   const targetStyle = clonedNode.style;
   if (!targetStyle) {
     return;
@@ -361,7 +380,7 @@ function cloneCSSStyle(nativeNode, clonedNode) {
     targetStyle.cssText = sourceStyle.cssText;
     targetStyle.transformOrigin = sourceStyle.transformOrigin;
   } else {
-    toArray(sourceStyle).forEach((name) => {
+    getStyleProperties(options).forEach((name) => {
       let value = sourceStyle.getPropertyValue(name);
       if (name === "font-size" && value.endsWith("px")) {
         const reducedFont = Math.floor(parseFloat(value.substring(0, value.length - 2))) - 0.1;
@@ -394,10 +413,10 @@ function cloneSelectValue(nativeNode, clonedNode) {
     }
   }
 }
-function decorate(nativeNode, clonedNode) {
+function decorate(nativeNode, clonedNode, options) {
   if (isInstanceOfElement(clonedNode, Element)) {
-    cloneCSSStyle(nativeNode, clonedNode);
-    clonePseudoElements(nativeNode, clonedNode);
+    cloneCSSStyle(nativeNode, clonedNode, options);
+    clonePseudoElements(nativeNode, clonedNode, options);
     cloneInputValue(nativeNode, clonedNode);
     cloneSelectValue(nativeNode, clonedNode);
   }
@@ -443,10 +462,10 @@ async function cloneNode(node, options, isRoot) {
   if (!isRoot && options.filter && !options.filter(node)) {
     return null;
   }
-  return Promise.resolve(node).then((clonedNode) => cloneSingleNode(clonedNode, options)).then((clonedNode) => cloneChildren(node, clonedNode, options)).then((clonedNode) => decorate(node, clonedNode)).then((clonedNode) => ensureSVGSymbols(clonedNode, options));
+  return Promise.resolve(node).then((clonedNode) => cloneSingleNode(clonedNode, options)).then((clonedNode) => cloneChildren(node, clonedNode, options)).then((clonedNode) => decorate(node, clonedNode, options)).then((clonedNode) => ensureSVGSymbols(clonedNode, options));
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/embed-resources.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/embed-resources.js
 var URL_REGEX = /url\((['"]?)([^'"]+?)\1\)/g;
 var URL_WITH_FORMAT_REGEX = /url\([^)]+\)\s*format\((["']?)([^"']+)\1\)/g;
 var FONT_SRC_REGEX = /src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g;
@@ -503,7 +522,7 @@ async function embedResources(cssText, baseUrl, options) {
   return urls.reduce((deferred, url) => deferred.then((css) => embed(css, url, baseUrl, options)), Promise.resolve(filteredCSSText));
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/embed-images.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/embed-images.js
 async function embedProp(propName, node, options) {
   var _a;
   const propValue = (_a = node.style) === null || _a === void 0 ? void 0 : _a.getPropertyValue(propName);
@@ -515,12 +534,9 @@ async function embedProp(propName, node, options) {
   return false;
 }
 async function embedBackground(clonedNode, options) {
-  if (!await embedProp("background", clonedNode, options)) {
-    await embedProp("background-image", clonedNode, options);
-  }
-  if (!await embedProp("mask", clonedNode, options)) {
-    await embedProp("mask-image", clonedNode, options);
-  }
+  ;
+  await embedProp("background", clonedNode, options) || await embedProp("background-image", clonedNode, options);
+  await embedProp("mask", clonedNode, options) || await embedProp("-webkit-mask", clonedNode, options) || await embedProp("mask-image", clonedNode, options) || await embedProp("-webkit-mask-image", clonedNode, options);
 }
 async function embedImageNode(clonedNode, options) {
   const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement);
@@ -531,7 +547,13 @@ async function embedImageNode(clonedNode, options) {
   const dataURL = await resourceToDataURL(url, getMimeType(url), options);
   await new Promise((resolve, reject) => {
     clonedNode.onload = resolve;
-    clonedNode.onerror = reject;
+    clonedNode.onerror = options.onImageErrorHandler ? (...attributes) => {
+      try {
+        resolve(options.onImageErrorHandler(...attributes));
+      } catch (error) {
+        reject(error);
+      }
+    } : reject;
     const image = clonedNode;
     if (image.decode) {
       image.decode = resolve;
@@ -560,7 +582,7 @@ async function embedImages(clonedNode, options) {
   }
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/apply-style.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/apply-style.js
 function applyStyle(node, options) {
   const { style } = node;
   if (options.backgroundColor) {
@@ -581,7 +603,7 @@ function applyStyle(node, options) {
   return node;
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/embed-webfonts.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/embed-webfonts.js
 var cssFetchCache = {};
 async function fetchCSS(url) {
   let cache2 = cssFetchCache[url];
@@ -674,7 +696,7 @@ async function getCSSRules(styleSheets, options) {
         const inline = styleSheets.find((a) => a.href == null) || document.styleSheets[0];
         if (sheet.href != null) {
           deferreds.push(fetchCSS(sheet.href).then((metadata) => embedFonts(metadata, options)).then((cssText) => parseCSS(cssText).forEach((rule) => {
-            inline.insertRule(rule, sheet.cssRules.length);
+            inline.insertRule(rule, inline.cssRules.length);
           })).catch((err) => {
             console.error("Error loading remote stylesheet", err);
           }));
@@ -709,9 +731,29 @@ async function parseWebFontRules(node, options) {
   const cssRules = await getCSSRules(styleSheets, options);
   return getWebFontRules(cssRules);
 }
+function normalizeFontFamily(font) {
+  return font.trim().replace(/["']/g, "");
+}
+function getUsedFonts(node) {
+  const fonts = /* @__PURE__ */ new Set();
+  function traverse(node2) {
+    const fontFamily = node2.style.fontFamily || getComputedStyle(node2).fontFamily;
+    fontFamily.split(",").forEach((font) => {
+      fonts.add(normalizeFontFamily(font));
+    });
+    Array.from(node2.children).forEach((child) => {
+      if (child instanceof HTMLElement) {
+        traverse(child);
+      }
+    });
+  }
+  traverse(node);
+  return fonts;
+}
 async function getWebFontCSS(node, options) {
   const rules = await parseWebFontRules(node, options);
-  const cssTexts = await Promise.all(rules.map((rule) => {
+  const usedFonts = getUsedFonts(node);
+  const cssTexts = await Promise.all(rules.filter((rule) => usedFonts.has(normalizeFontFamily(rule.style.fontFamily))).map((rule) => {
     const baseUrl = rule.parentStyleSheet ? rule.parentStyleSheet.href : null;
     return embedResources(rule.cssText, baseUrl, options);
   }));
@@ -731,7 +773,7 @@ async function embedWebFonts(clonedNode, options) {
   }
 }
 
-// node_modules/.deno/html-to-image@1.11.11/node_modules/html-to-image/es/index.js
+// node_modules/.deno/html-to-image@1.11.13/node_modules/html-to-image/es/index.js
 async function toSvg(node, options = {}) {
   const { width, height } = getImageSize(node, options);
   const clonedNode = await cloneNode(node, options, true);
