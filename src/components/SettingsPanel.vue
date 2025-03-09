@@ -86,7 +86,7 @@
           class="checkbox-input"
           :disabled="store.isProcessing"
         />
-        <label for="inverted" class="text-base">
+        <label for="inverted" class="text-subtext0">
           Invert colors
         </label>
       </div>
@@ -100,7 +100,7 @@
           class="checkbox-input"
           :disabled="store.isProcessing"
         />
-        <label for="colored" class="text-base">
+        <label for="colored" class="text-subtext0">
           Colored output
         </label>
       </div>
