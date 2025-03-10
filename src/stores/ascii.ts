@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { processImage } from "../utils/asciiConverter.ts";
+import { getDitheringStrategy } from "../utils/dithering/utils";
 
 export const useAsciiStore = defineStore("ascii", {
 	state: () => ({
@@ -11,6 +12,7 @@ export const useAsciiStore = defineStore("ascii", {
 		brightness: 1,
 		inverted: false,
 		isProcessing: false,
+		ditheringStrategy: "none",
 	}),
 
 	actions: {
@@ -24,6 +26,7 @@ export const useAsciiStore = defineStore("ascii", {
 
 			this.isProcessing = true;
 			try {
+				const ditheringStrategy = getDitheringStrategy(this.ditheringStrategy);
 				const newAscii = await processImage(
 					this.imageData,
 					this.resolution,
@@ -31,6 +34,7 @@ export const useAsciiStore = defineStore("ascii", {
 					this.brightness,
 					this.inverted,
 					this.coloredAscii,
+					ditheringStrategy,
 				);
 				this.asciiArt = newAscii;
 			} catch (error) {
