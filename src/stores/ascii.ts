@@ -24,7 +24,7 @@ export const useAsciiStore = defineStore("ascii", {
 
 			this.isProcessing = true;
 			try {
-				const newAscii = await processImage(
+				this.asciiArt = await processImage(
 					this.imageData,
 					this.resolution,
 					this.contrast,
@@ -32,7 +32,6 @@ export const useAsciiStore = defineStore("ascii", {
 					this.inverted,
 					this.coloredAscii,
 				);
-				this.asciiArt = newAscii;
 			} catch (error) {
 				console.error("Error generating ASCII art:", error);
 			} finally {

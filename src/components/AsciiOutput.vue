@@ -88,16 +88,12 @@ const outputRef = ref<HTMLDivElement | null>(null);
 const scale = ref(1);
 const isFullscreen = ref(false);
 
-function handleFullscreenChange() {
+function handleFullScreen() {
 	isFullscreen.value = document.fullscreenElement !== null;
 }
 
-onMounted(() => {
-	document.addEventListener("fullscreenchange", handleFullscreenChange);
-});
-onUnmounted(() => {
-	document.removeEventListener("fullscreenchange", handleFullscreenChange);
-});
+onMounted(() => document.addEventListener("fullscreenchange", handleFullScreen));
+onUnmounted(() => document.removeEventListener("fullscreenchange", handleFullScreen));
 
 async function downloadAsPng() {
 	if (!outputRef.value || !store.asciiArt) return;
