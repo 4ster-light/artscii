@@ -110,6 +110,5 @@
 
 <script setup lang="ts">
 import { useAsciiStore } from "../stores/ascii";
-
 const store = useAsciiStore();
 </script>
