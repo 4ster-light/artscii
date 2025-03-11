@@ -59,7 +59,6 @@ export const processImage = (
 
 				const chars = inverted ? ASCII_CHARS_INVERTED : ASCII_CHARS;
 				const charCount = chars.length - 1;
-				const scale = 255 / charCount;
 
 				const grayscale: number[] = new Array(width * height);
 				const colors: [number, number, number][] = colored
@@ -89,7 +88,7 @@ export const processImage = (
 						const value = grayscale[i];
 						const charIndex = Math.min(
 							chars.length - 1,
-							Math.max(0, Math.round(value / scale)),
+							Math.floor((value / 255) * charCount),
 						);
 						const char = chars[charIndex];
 						if (colored) {
