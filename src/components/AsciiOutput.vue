@@ -92,15 +92,19 @@ function handleFullScreen() {
 	isFullscreen.value = document.fullscreenElement !== null;
 }
 
-onMounted(() => document.addEventListener("fullscreenchange", handleFullScreen));
-onUnmounted(() => document.removeEventListener("fullscreenchange", handleFullScreen));
+onMounted(() =>
+	document.addEventListener("fullscreenchange", handleFullScreen),
+);
+onUnmounted(() =>
+	document.removeEventListener("fullscreenchange", handleFullScreen),
+);
 
 async function downloadAsPng() {
 	if (!outputRef.value || !store.asciiArt) return;
 
 	try {
 		const dataUrl = await toPng(outputRef.value, {
-			backgroundColor: store.coloredAscii ? "#1e1e2e" : "#1e1e2e",
+			backgroundColor: "#000000",
 			style: {
 				transform: "scale(1)",
 				transformOrigin: "top left",
