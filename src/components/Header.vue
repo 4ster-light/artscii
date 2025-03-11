@@ -2,11 +2,13 @@
   <header class="bg-mantle border-b border-surface0 py-4 px-6">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-mauve to-blue bg-clip-text text-transparent">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-mauve to-blue bg-clip-text text-transparent cursor-pointer" @click="navigateToHome">
           ✰ArtSCII✰
         </h1>
       </div>
       <div class="flex items-center gap-2">
+        <router-link to="/video" class="p-2 font-semibold rounded-lg bg-surface0 hover:bg-surface1 transition-colors">Video</router-link>
+        <span class="text-subtext0 font-black text-2xl">|</span>
         <a
           href="https://x.com/4ster_light"
           target="_blank"
@@ -36,4 +38,11 @@
       </div>
     </div>
   </header>
-</template> 
+</template>
+
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+const navigateToHome = () => router.push({ name: "Home" });
+</script>
