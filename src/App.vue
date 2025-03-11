@@ -19,6 +19,10 @@
   </div>
 </template>
 
+<style>
+@import "./assets/css/global.css";
+</style>
+
 <script setup lang="ts">
 import AsciiOutput from "./components/AsciiOutput.vue";
 import Footer from "./components/Footer.vue";
