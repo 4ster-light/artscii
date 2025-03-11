@@ -27,7 +27,7 @@ export const useAsciiStore = defineStore("ascii", {
 			this.isProcessing = true;
 			try {
 				const ditheringStrategy = getDitheringStrategy(this.ditheringStrategy);
-				const newAscii = await processImage(
+				this.asciiArt = await processImage(
 					this.imageData,
 					this.resolution,
 					this.contrast,
@@ -36,7 +36,6 @@ export const useAsciiStore = defineStore("ascii", {
 					this.coloredAscii,
 					ditheringStrategy,
 				);
-				this.asciiArt = newAscii;
 			} catch (error) {
 				console.error("Error generating ASCII art:", error);
 			} finally {
