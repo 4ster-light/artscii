@@ -1,3 +1,5 @@
+import type { DitheringStrategy } from "./dithering/ditheringStrategy";
+
 const ASCII_CHARS = " .,:;i1tfLCG08@";
 const ASCII_CHARS_INVERTED = "@80GCLft1i;:,. ";
 
@@ -29,6 +31,7 @@ export const processImage = (
 	brightness = 1,
 	inverted = false,
 	colored = false,
+	ditheringStrategy: DitheringStrategy | null = null,
 ): Promise<string> => {
 	return new Promise((resolve, reject) => {
 		const img = new Image();
@@ -47,6 +50,8 @@ export const processImage = (
 					return;
 				}
 
+				console.log(ditheringStrategy);
+
 				ctx.drawImage(img, 0, 0, width, height);
 
 				const imageData = ctx.getImageData(0, 0, width, height);
@@ -55,22 +60,43 @@ export const processImage = (
 				const chars = inverted ? ASCII_CHARS_INVERTED : ASCII_CHARS;
 				const charCount = chars.length - 1;
 
-				let result = "";
+				const grayscale: number[] = new Array(width * height);
+				const colors: [number, number, number][] = colored
+					? new Array(width * height)
+					: [];
+
 				for (let y = 0; y < height; y++) {
 					for (let x = 0; x < width; x++) {
 						const idx = (y * width + x) * 4;
-
 						const [r, g, b] = [0, 1, 2].map((i) =>
 							adjustPixel(pixels[idx + i], contrast, brightness),
 						);
-
 						const pixelBrightness = getPixelBrightness(r, g, b);
-						const charIndex = Math.floor((pixelBrightness / 255) * charCount);
-						const char = chars[charIndex];
+						grayscale[y * width + x] = pixelBrightness;
+						if (colored) colors[y * width + x] = [r, g, b];
+					}
+				}
 
-						result += colored
-							? `<span style="color: rgb(${r},${g},${b})">${char}</span>`
-							: char;
+				if (ditheringStrategy) {
+					ditheringStrategy.dithering(grayscale, width, height, charCount);
+				}
+
+				let result = "";
+				for (let y = 0; y < height; y++) {
+					for (let x = 0; x < width; x++) {
+						const i = y * width + x;
+						const value = grayscale[i];
+						const charIndex = Math.min(
+							chars.length - 1,
+							Math.floor((value / 255) * charCount),
+						);
+						const char = chars[charIndex];
+						if (colored) {
+							const [r, g, b] = colors[i];
+							result += `<span style="color: rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})">${char}</span>`;
+						} else {
+							result += char;
+						}
 					}
 					result += colored ? "<br>" : "\n";
 				}
