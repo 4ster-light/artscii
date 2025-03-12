@@ -206,6 +206,27 @@ input[type="range"]::-moz-range-thumb {
 	border-color: var(--mauve);
 }
 
+.select-input {
+	width: 100%;
+	padding: 0.5rem;
+	border-radius: 0.25rem;
+	background-color: var(--surface0);
+	border: 1px solid var(--surface2);
+	color: var(--text);
+	transition: all 0.2s ease;
+}
+
+.select-input:disabled {
+	background-color: var(--surface1);
+	cursor: not-allowed;
+}
+
+.select-input:focus {
+	outline: none;
+	border-color: var(--mauve);
+	box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.2);
+}
+
 @media (max-width: 768px) {
 	.checkbox-input {
 		width: 24px;

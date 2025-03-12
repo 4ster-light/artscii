@@ -104,11 +104,25 @@
           Colored output
         </label>
       </div>
+
+      <div>
+        <label for="dithering" class="text-subtext0">Dithering </label>
+        <select id="dithering" v-model="store.ditheringStrategy" @change="store.generateAscii" class="select-input"
+          :disabled="store.isProcessing">
+          <option v-for="option in availableStrategies" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+        <p class="text-xs text-overlay0 mt-1">
+          Dithering can improve the appearance of the ASCII art by reducing banding.
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAsciiStore } from "../stores/ascii";
+import { availableStrategies } from "../utils/dithering/utils";
 const store = useAsciiStore();
 </script>
