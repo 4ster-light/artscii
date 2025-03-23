@@ -33,5 +33,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "artscii"
-          entrypoint: "deno run --allow-net --allow-read --allow-env index.mjs"
+          entrypoint: "index.mjs"
           root: ".output/server"
