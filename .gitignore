@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 .vite
+.output
 node_modules
 dist
 dist-ssr
