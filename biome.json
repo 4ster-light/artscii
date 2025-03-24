@@ -7,7 +7,17 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": []
+		"ignore": [
+			".nuxt",
+			"node_modules",
+			"public",
+			".output",
+			".vite",
+			"assets",
+			"dist",
+			"build",
+			".github"
+		]
 	},
 	"formatter": {
 		"enabled": true,

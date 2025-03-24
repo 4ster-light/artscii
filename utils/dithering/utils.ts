@@ -8,7 +8,7 @@ export const availableStrategies = [
 	{ value: "atkinson", label: "Atkinson" },
 	{ value: "floyd-steinberg", label: "Floyd-Steinberg" },
 	{ value: "riemersma", label: "Riemersma" },
-];
+] as const;
 
 export function getDitheringStrategy(name: string): DitheringStrategy | null {
 	switch (name) {

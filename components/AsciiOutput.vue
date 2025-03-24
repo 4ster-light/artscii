@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { toPng } from "html-to-image";
-import { useAsciiStore } from "../stores/ascii";
 
 const store = useAsciiStore();
 const outputRef = ref<HTMLDivElement | null>(null);

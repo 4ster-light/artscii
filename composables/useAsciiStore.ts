@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { processImage } from "../utils/asciiConverter.ts";
+import { processImage } from "../utils/asciiConverter";
 import { getDitheringStrategy } from "../utils/dithering/utils";
 
 export const useAsciiStore = defineStore("ascii", {

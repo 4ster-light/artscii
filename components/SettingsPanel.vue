@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAsciiStore } from "../stores/ascii";
 import { availableStrategies } from "../utils/dithering/utils";
 const store = useAsciiStore();
 </script>

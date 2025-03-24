@@ -24,7 +24,7 @@ function adjustPixel(
 	return Math.max(0, Math.min(255, adjusted)); // Clamp to valid range
 }
 
-export const processImage = (
+export function processImage(
 	imageUrl: string,
 	resolution = 0.3,
 	contrast = 1,
@@ -32,7 +32,7 @@ export const processImage = (
 	inverted = false,
 	colored = false,
 	ditheringStrategy: DitheringStrategy | null = null,
-): Promise<string> => {
+): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const img = new Image();
 		img.crossOrigin = "Anonymous";
@@ -113,4 +113,4 @@ export const processImage = (
 
 		img.src = imageUrl;
 	});
-};
+}

@@ -95,7 +95,7 @@ declare global {
   const unref: typeof import('../../node_modules/.deno/vue@3.5.13/node_modules/vue')['unref']
   const updateAppConfig: typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/config')['updateAppConfig']
   const useAppConfig: typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/config')['useAppConfig']
-  const useAsciiStore: typeof import('../../stores/ascii')['useAsciiStore']
+  const useAsciiStore: typeof import('../../composables/useAsciiStore')['useAsciiStore']
   const useAsyncData: typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']
   const useAttrs: typeof import('../../node_modules/.deno/vue@3.5.13/node_modules/vue')['useAttrs']
   const useCookie: typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/composables/cookie')['useCookie']
@@ -277,7 +277,7 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('../../node_modules/.deno/vue@3.5.13/node_modules/vue')['unref']>
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/config')['updateAppConfig']>
     readonly useAppConfig: UnwrapRef<typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/config')['useAppConfig']>
-    readonly useAsciiStore: UnwrapRef<typeof import('../../stores/ascii')['useAsciiStore']>
+    readonly useAsciiStore: UnwrapRef<typeof import('../../composables/useAsciiStore')['useAsciiStore']>
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>
     readonly useAttrs: UnwrapRef<typeof import('../../node_modules/.deno/vue@3.5.13/node_modules/vue')['useAttrs']>
     readonly useCookie: UnwrapRef<typeof import('../../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/composables/cookie')['useCookie']>

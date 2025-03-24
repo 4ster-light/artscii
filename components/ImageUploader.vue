@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useAsciiStore } from "../stores/ascii";
-
 const store = useAsciiStore();
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -41,7 +39,7 @@ function processFile(file: File) {
     <div
       class="border-2 border-dashed border-surface2 rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-mauve"
       @click="triggerFileInput"
-      @keydown="e => e.key === 'Enter' && triggerFileInput()"
+      @keydown="(e: KeyboardEvent) => e.key === 'Enter' && triggerFileInput()"
       @drop.prevent="handleDrop"
       @dragover.prevent
     >
