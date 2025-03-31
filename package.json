@@ -5,7 +5,6 @@
     "preview": "nuxt preview",
     "prepare": "nuxt prepare",
     "lint": "biome check --write .",
-    "serve": "bun dist/server/index.mjs"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.10.1",

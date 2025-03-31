@@ -13,6 +13,7 @@ export default defineNuxtConfig({
 		plugins: [tailwindcss()]
 	},
   nitro: {
+  	preset: "netlify",
     output: {
       dir: "dist",
     }
