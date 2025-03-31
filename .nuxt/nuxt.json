@@ -1,9 +1,9 @@
 {
-  "_hash": "EXRzWWKFYm4A8VUSnmWGz64R6ei1lsv2sF42elemoEk",
+  "_hash": "fuEU3II25EAojK9pfv46FB458lbtMpjnnGW_GukTbXw",
   "project": {
     "rootDir": "/home/aster/Documents/artscii"
   },
   "versions": {
-    "nuxt": "3.16.1"
+    "nuxt": "3.16.0"
   }
 }

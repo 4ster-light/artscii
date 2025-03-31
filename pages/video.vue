@@ -1,12 +1,12 @@
 <script setup lang="ts">
 useSeoMeta({
-	title: "✰ArTXT✰",
+	title: "✰ArtSCII✰",
 	description: "The best image to ascii art converter",
-	ogTitle: "ArTXT",
+	ogTitle: "ArtSCII",
 	ogDescription: "The best image to ascii art converter",
 	ogImage: "/Icon.svg",
-	ogUrl: "https://artxt.netlify.app",
-	twitterTitle: "ArTXT",
+	ogUrl: "https://artscii.deno.dev",
+	twitterTitle: "ArtSCII",
 	twitterDescription: "The best image to ascii art converter",
 	twitterImage: "/Icon.svg",
 	twitterCard: "summary",

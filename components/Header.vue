@@ -4,7 +4,7 @@
       <div class="flex items-center">
         <h1 class="text-2xl font-bold bg-gradient-to-r from-mauve to-blue bg-clip-text text-transparent cursor-pointer"
           @click="navigateTo('/')">
-          ✰ArTXT✰
+          ✰ArtSCII✰
         </h1>
       </div>
       <div class="flex items-center gap-2">
