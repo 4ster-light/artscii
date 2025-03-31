@@ -34,4 +34,4 @@ jobs:
         with:
           project: "artscii"
           entrypoint: "index.mjs"
-          root: ".output/server"
+          root: "dist/server"
