@@ -3,49 +3,49 @@
   "compilerOptions": {
     "paths": {
       "nitropack/types": [
-        "../node_modules/nitropack/types"
+        "../node_modules/.deno/nitropack@2.11.6/node_modules/nitropack/types"
       ],
       "nitropack/runtime": [
-        "../node_modules/nitropack/runtime"
+        "../node_modules/.deno/nitropack@2.11.6/node_modules/nitropack/runtime"
       ],
       "nitropack": [
-        "../node_modules/nitropack"
+        "../node_modules/.deno/nitropack@2.11.6/node_modules/nitropack"
       ],
       "defu": [
-        "../node_modules/defu"
+        "../node_modules/.deno/defu@6.1.4/node_modules/defu"
       ],
       "h3": [
-        "../node_modules/h3"
+        "../node_modules/.deno/h3@1.15.1/node_modules/h3"
       ],
       "consola": [
-        "../node_modules/consola"
+        "../node_modules/.deno/consola@3.4.0/node_modules/consola"
       ],
       "ofetch": [
-        "../node_modules/ofetch"
+        "../node_modules/.deno/ofetch@1.4.1/node_modules/ofetch"
       ],
       "@unhead/vue": [
-        "../node_modules/@unhead/vue"
+        "../node_modules/.deno/@unhead+vue@2.0.0-rc.9/node_modules/@unhead/vue"
       ],
       "@nuxt/devtools": [
-        "../node_modules/@nuxt/devtools"
+        "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools"
       ],
       "@vue/runtime-core": [
-        "../node_modules/@vue/runtime-core"
+        "../node_modules/.deno/@vue+runtime-core@3.5.13/node_modules/@vue/runtime-core"
       ],
       "@vue/compiler-sfc": [
-        "../node_modules/@vue/compiler-sfc"
+        "../node_modules/.deno/@vue+compiler-sfc@3.5.13/node_modules/@vue/compiler-sfc"
       ],
       "unplugin-vue-router/client": [
-        "../node_modules/unplugin-vue-router/client"
+        "../node_modules/.deno/unplugin-vue-router@0.12.0/node_modules/unplugin-vue-router/client"
       ],
       "@nuxt/schema": [
-        "../node_modules/@nuxt/schema"
+        "../node_modules/.deno/@nuxt+schema@3.16.0/node_modules/@nuxt/schema"
       ],
       "nuxt": [
-        "../node_modules/nuxt"
+        "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt"
       ],
       "vite/client": [
-        "../node_modules/vite/client"
+        "../node_modules/.deno/vite@6.2.1/node_modules/vite/client"
       ],
       "~": [
         ".."
@@ -87,25 +87,25 @@
         "../public/*"
       ],
       "#app": [
-        "../node_modules/nuxt/dist/app"
+        "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app"
       ],
       "#app/*": [
-        "../node_modules/nuxt/dist/app/*"
+        "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/*"
       ],
       "vue-demi": [
-        "../node_modules/nuxt/dist/app/compat/vue-demi"
+        "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/app/compat/vue-demi"
       ],
       "#vue-router": [
-        "../node_modules/vue-router"
+        "../node_modules/.deno/vue-router@4.5.0/node_modules/vue-router"
       ],
       "#unhead/composables": [
-        "../node_modules/nuxt/dist/head/runtime/composables/v3"
+        "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/dist/head/runtime/composables/v3"
       ],
       "#imports": [
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/ee573e84-c6e1-4802-a6fd-6becd676d280.json"
+        "./manifest/meta/6adcd879-8b37-4980-9012-c59fd28309fa.json"
       ],
       "#components": [
         "./components"
@@ -129,7 +129,7 @@
     "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
-    "module": "ESNext",
+    "module": "preserve",
     "noEmit": true,
     "lib": [
       "ESNext",
@@ -149,26 +149,26 @@
     "./nuxt.d.ts",
     "../.config/nuxt.*",
     "../**/*",
-    "../node_modules/@pinia/nuxt/runtime",
-    "../node_modules/@pinia/nuxt/dist/runtime",
-    "../node_modules/@nuxt/devtools/runtime",
-    "../node_modules/@nuxt/devtools/dist/runtime",
-    "../node_modules/@nuxt/telemetry/runtime",
-    "../node_modules/@nuxt/telemetry/dist/runtime",
+    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/runtime",
+    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/dist/runtime",
+    "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools/runtime",
+    "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools/dist/runtime",
+    "../node_modules/.deno/@nuxt+telemetry@2.6.5/node_modules/@nuxt/telemetry/runtime",
+    "../node_modules/.deno/@nuxt+telemetry@2.6.5/node_modules/@nuxt/telemetry/dist/runtime",
     ".."
   ],
   "exclude": [
     "../dist",
     "../node_modules",
-    "../node_modules/nuxt/node_modules",
-    "../node_modules/@pinia/nuxt/node_modules",
-    "../node_modules/@nuxt/devtools/node_modules",
-    "../node_modules/@nuxt/telemetry/node_modules",
-    "../node_modules/@pinia/nuxt/runtime/server",
-    "../node_modules/@pinia/nuxt/dist/runtime/server",
-    "../node_modules/@nuxt/devtools/runtime/server",
-    "../node_modules/@nuxt/devtools/dist/runtime/server",
-    "../node_modules/@nuxt/telemetry/runtime/server",
-    "../node_modules/@nuxt/telemetry/dist/runtime/server"
+    "../node_modules/.deno/nuxt@3.16.0/node_modules/nuxt/node_modules",
+    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/node_modules",
+    "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools/node_modules",
+    "../node_modules/.deno/@nuxt+telemetry@2.6.5/node_modules/@nuxt/telemetry/node_modules",
+    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/runtime/server",
+    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/dist/runtime/server",
+    "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools/runtime/server",
+    "../node_modules/.deno/@nuxt+devtools@2.2.1/node_modules/@nuxt/devtools/dist/runtime/server",
+    "../node_modules/.deno/@nuxt+telemetry@2.6.5/node_modules/@nuxt/telemetry/runtime/server",
+    "../node_modules/.deno/@nuxt+telemetry@2.6.5/node_modules/@nuxt/telemetry/dist/runtime/server"
   ]
 }

@@ -4,7 +4,6 @@
     "npm:@biomejs/biome@*": "1.9.4",
     "npm:@biomejs/biome@1.9.4": "1.9.4",
     "npm:@biomejs/biome@^1.9.4": "1.9.4",
-    "npm:@deno/vite-plugin@^1.0.4": "1.0.4_vite@6.2.1__lightningcss@1.29.2__jiti@2.4.2",
     "npm:@pinia/nuxt@~0.10.1": "0.10.1_pinia@3.0.1__vue@3.5.13_vue@3.5.13",
     "npm:@tailwindcss/vite@4.0.9": "4.0.9_vite@6.2.1__lightningcss@1.29.2__jiti@2.4.2_lightningcss@1.29.2",
     "npm:create-nuxt@latest": "3.22.5",
@@ -260,12 +259,6 @@
       "integrity": "sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==",
       "dependencies": [
         "mime@3.0.0"
-      ]
-    },
-    "@deno/vite-plugin@1.0.4_vite@6.2.1__lightningcss@1.29.2__jiti@2.4.2": {
-      "integrity": "sha512-xg8YT8Wn2sGXSnJgiGTpBGX1Dov0c6fd1rAp8VsfrCUtyBRRWzwVMAnd3fQ4yq8h7LSVvJUxEFN4U421k/DQLA==",
-      "dependencies": [
-        "vite@6.2.1_lightningcss@1.29.2_jiti@2.4.2"
       ]
     },
     "@emnapi/core@1.3.1": {
@@ -4203,17 +4196,18 @@
     "https://deno.land/std@0.224.0/version.ts": "f6a28c9704d82d1c095988777e30e6172eb674a6570974a0d27a653be769bbbe"
   },
   "workspace": {
-    "dependencies": [
-      "npm:@biomejs/biome@1.9.4",
-      "npm:@deno/vite-plugin@^1.0.4",
-      "npm:@pinia/nuxt@~0.10.1",
-      "npm:@tailwindcss/vite@4.0.9",
-      "npm:html-to-image@^1.11.13",
-      "npm:nuxt@^3.16.0",
-      "npm:pinia@^3.0.1",
-      "npm:tailwindcss@4.0.9",
-      "npm:vue-router@^4.5.0",
-      "npm:vue@^3.5.13"
-    ]
+    "packageJson": {
+      "dependencies": [
+        "npm:@biomejs/biome@1.9.4",
+        "npm:@pinia/nuxt@~0.10.1",
+        "npm:@tailwindcss/vite@4.0.9",
+        "npm:html-to-image@^1.11.13",
+        "npm:nuxt@^3.16.0",
+        "npm:pinia@^3.0.1",
+        "npm:tailwindcss@4.0.9",
+        "npm:vue-router@^4.5.0",
+        "npm:vue@^3.5.13"
+      ]
+    }
   }
 }

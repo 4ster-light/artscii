@@ -4,7 +4,8 @@
 		"build": "nuxt build",
 		"preview": "nuxt preview",
 		"prepare": "nuxt prepare",
-		"lint": "biome check --write ."
+		"lint": "biome check --write .",
+		"serve": "deno run --allow-all dist/server/index.mjs"
 	},
 	"dependencies": {
 		"@pinia/nuxt": "^0.10.1",
