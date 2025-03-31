@@ -1,12 +1,12 @@
 <script setup lang="ts">
 useSeoMeta({
-	title: "Artscii",
+	title: "✰ArtSCII✰",
 	description: "The best image to ascii art converter",
-	ogTitle: "✰ArtSCII✰",
+	ogTitle: "Artscii",
 	ogDescription: "The best image to ascii art converter",
 	ogImage: "/Icon.svg",
 	ogUrl: "https://artscii.deno.dev",
-	twitterTitle: "✰ArtSCII✰",
+	twitterTitle: "Artscii",
 	twitterDescription: "The best image to ascii art converter",
 	twitterImage: "/Icon.svg",
 	twitterCard: "summary",
@@ -27,7 +27,7 @@ useHead({
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center h-[87vh]">
+  <main class="flex flex-col items-center justify-center h-screen">
     <h1 class="text-5xl md:text-7xl mb-10 font-bold text-transparent bg-clip-text bg-gradient-to-r from-mauve to-blue leading-tight">
       ✰ Coming soon ✰
     </h1>
