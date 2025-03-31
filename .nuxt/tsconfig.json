@@ -96,7 +96,7 @@
         "../node_modules/nuxt/dist/app/compat/vue-demi"
       ],
       "#vue-router": [
-        "../node_modules/.deno/vue-router@4.5.0/node_modules/vue-router"
+        "../node_modules/vue-router"
       ],
       "#unhead/composables": [
         "../node_modules/nuxt/dist/head/runtime/composables/v3"
@@ -105,7 +105,7 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/204183c7-181a-45cf-a36a-ff9206e5340e.json"
+        "./manifest/meta/69e31ec7-3582-46e8-8254-a3f23bd1df67.json"
       ],
       "#components": [
         "./components"
@@ -129,7 +129,7 @@
     "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
-    "module": "preserve",
+    "module": "ESNext",
     "noEmit": true,
     "lib": [
       "ESNext",
@@ -149,8 +149,8 @@
     "./nuxt.d.ts",
     "../.config/nuxt.*",
     "../**/*",
-    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/runtime",
-    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/dist/runtime",
+    "../node_modules/@pinia/nuxt/runtime",
+    "../node_modules/@pinia/nuxt/dist/runtime",
     "../node_modules/@nuxt/devtools/runtime",
     "../node_modules/@nuxt/devtools/dist/runtime",
     "../node_modules/@nuxt/telemetry/runtime",
@@ -161,15 +161,14 @@
     "../dist",
     "../node_modules",
     "../node_modules/nuxt/node_modules",
-    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/node_modules",
+    "../node_modules/@pinia/nuxt/node_modules",
     "../node_modules/@nuxt/devtools/node_modules",
     "../node_modules/@nuxt/telemetry/node_modules",
-    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/runtime/server",
-    "../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/dist/runtime/server",
+    "../node_modules/@pinia/nuxt/runtime/server",
+    "../node_modules/@pinia/nuxt/dist/runtime/server",
     "../node_modules/@nuxt/devtools/runtime/server",
     "../node_modules/@nuxt/devtools/dist/runtime/server",
     "../node_modules/@nuxt/telemetry/runtime/server",
-    "../node_modules/@nuxt/telemetry/dist/runtime/server",
-    "../.output"
+    "../node_modules/@nuxt/telemetry/dist/runtime/server"
   ]
 }
