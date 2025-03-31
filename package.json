@@ -1,20 +1,20 @@
 {
-  "scripts": {
-    "dev": "nuxt dev",
-    "build": "nuxt build",
-    "preview": "nuxt preview",
-    "prepare": "nuxt prepare",
-    "lint": "biome check --write ."
-  },
-  "dependencies": {
-    "@pinia/nuxt": "^0.10.1",
-    "html-to-image": "^1.11.13",
-    "@biomejs/biome": "1.9.4",
-    "nuxt": "^3.16.0",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
-    "pinia": "^3.0.1",
-    "tailwindcss": "4.0.9",
-    "@tailwindcss/vite": "4.0.9"
-  }
+	"scripts": {
+		"dev": "nuxt dev",
+		"build": "nuxt build",
+		"preview": "nuxt preview",
+		"prepare": "nuxt prepare",
+		"lint": "biome check --write ."
+	},
+	"dependencies": {
+		"@pinia/nuxt": "^0.10.1",
+		"html-to-image": "^1.11.13",
+		"@biomejs/biome": "1.9.4",
+		"nuxt": "^3.16.0",
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.0",
+		"pinia": "^3.0.1",
+		"tailwindcss": "4.0.9",
+		"@tailwindcss/vite": "4.0.9"
+	}
 }
