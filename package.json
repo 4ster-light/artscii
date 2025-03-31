@@ -4,7 +4,7 @@
     "build": "nuxt build",
     "preview": "nuxt preview",
     "prepare": "nuxt prepare",
-    "lint": "biome check --write .",
+    "lint": "biome check --write ."
   },
   "dependencies": {
     "@pinia/nuxt": "^0.10.1",
