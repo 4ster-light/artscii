@@ -30,5 +30,5 @@ export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callba
 export { setInterval } from '#app/compat/interval';
 export { useAsciiStore } from '../composables/useAsciiStore';
 export { processImage } from '../utils/asciiConverter';
-export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/.deno/@pinia+nuxt@0.10.1/node_modules/@pinia/nuxt/dist/runtime/composables';
+export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';
