@@ -10,12 +10,12 @@ export default defineNuxtConfig({
 	modules: ["@pinia/nuxt"],
 	css: ["./assets/css/global.css"],
 	vite: {
-		plugins: [tailwindcss()]
+		plugins: [tailwindcss()],
 	},
-  nitro: {
-  	preset: "netlify",
-    output: {
-      dir: "dist",
-    }
-  }
+	nitro: {
+		preset: "netlify",
+		output: {
+			dir: "dist",
+		},
+	},
 });
