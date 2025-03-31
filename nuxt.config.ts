@@ -1,4 +1,3 @@
-import deno from "@deno/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { defineNuxtConfig } from "nuxt/config";
 
@@ -11,6 +10,6 @@ export default defineNuxtConfig({
 	modules: ["@pinia/nuxt"],
 	css: ["./assets/css/global.css"],
 	vite: {
-		plugins: [tailwindcss(), deno()],
+		plugins: [tailwindcss()],
 	},
 });
