@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { availableStrategies } from "../utils/dithering/utils";
-const store = useAsciiStore();
+import { availableStrategies } from "../utils/dithering/utils"
+const store = useAsciiStore()
 </script>
 
 <template>

@@ -1,66 +1,66 @@
 <script setup lang="ts">
-import { toPng } from "html-to-image";
+import { toPng } from "html-to-image"
 
-const store = useAsciiStore();
-const outputRef = ref<HTMLDivElement | null>(null);
-const scale = ref(1);
-const isFullscreen = ref(false);
-
-function handleFullScreen() {
-	isFullscreen.value = document.fullscreenElement !== null;
-}
+const store = useAsciiStore()
+const outputRef = ref<HTMLDivElement | null>(null)
+const scale = ref(1)
+const isFullscreen = ref(false)
 
 onMounted(() =>
-	document.addEventListener("fullscreenchange", handleFullScreen),
-);
+	document.addEventListener("fullscreenchange", () => {
+		isFullscreen.value = document.fullscreenElement !== null
+	}),
+)
 onUnmounted(() =>
-	document.removeEventListener("fullscreenchange", handleFullScreen),
-);
+	document.removeEventListener("fullscreenchange", () => {
+		isFullscreen.value = document.fullscreenElement !== null
+	}),
+)
 
 async function downloadAsPng() {
-	if (!outputRef.value || !store.asciiArt) return;
+	if (!outputRef.value || !store.asciiArt) return
 
-	try {
-		const dataUrl = await toPng(outputRef.value, {
-			backgroundColor: "#000000",
-			style: {
-				transform: "scale(1)",
-				transformOrigin: "top left",
-			},
-		});
-
-		const link = document.createElement("a");
-		link.download = "ascii-art.png";
-		link.href = dataUrl;
-		link.click();
-	} catch (error) {
-		console.error("Error downloading image:", error);
-	}
+	await toPng(outputRef.value as HTMLDivElement, {
+		backgroundColor: "#000000",
+		style: {
+			transform: `scale(${scale.value})`,
+			transformOrigin: "top left",
+		},
+	})
+		.then((dataUrl) => {
+			const link = document.createElement("a")
+			link.download = "ascii-art.png"
+			link.href = dataUrl
+			link.click()
+		})
+		.catch((error) => {
+			console.error("Error downloading image:", error)
+		})
 }
 
 async function downloadAsText() {
-	if (!store.asciiArt) return;
+	if (!store.asciiArt) return
 
-	const blob = new Blob([store.asciiArt], { type: "text/plain" });
-	const url = URL.createObjectURL(blob);
+	const blob = new Blob([store.asciiArt], { type: "text/plain" })
+	const url = URL.createObjectURL(blob)
 
-	const link = document.createElement("a");
-	link.download = "ascii-art.txt";
-	link.href = url;
-	link.click();
+	const link = document.createElement("a")
+	link.download = "ascii-art.txt"
+	link.href = url
+	link.click()
 
-	URL.revokeObjectURL(url);
+	URL.revokeObjectURL(url)
 }
 
 async function toggleFullscreen() {
-	if (!outputRef.value) return;
+	if (!outputRef.value) return
 
 	if (!document.fullscreenElement) {
 		outputRef.value.requestFullscreen().catch((error) => {
-			console.error(`Error attempting to enable fullscreen: ${error.message}`);
-		});
+			console.error(`Error attempting to enable fullscreen: ${error.message}`)
+		})
 	} else {
-		await document.exitFullscreen();
+		await document.exitFullscreen()
 	}
 }
 </script>

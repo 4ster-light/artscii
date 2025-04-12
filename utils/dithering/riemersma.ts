@@ -1,4 +1,4 @@
-import type { DitheringStrategy } from "./ditheringStrategy";
+import type { DitheringStrategy } from "./ditheringStrategy"
 
 export class RiemersmaDithering implements DitheringStrategy {
 	dithering(
@@ -7,9 +7,9 @@ export class RiemersmaDithering implements DitheringStrategy {
 		height: number,
 		quantizationLevels: number,
 	): void {
-		const scale = 255 / (quantizationLevels - 1);
-		const visited = new Array(height * width).fill(false);
-		let error = 0;
+		const scale = 255 / (quantizationLevels - 1)
+		const visited = new Array(height * width).fill(false)
+		let error = 0
 
 		// Spiral directions (8-connected neighborhood)
 		const spiralDirections = [
@@ -21,24 +21,24 @@ export class RiemersmaDithering implements DitheringStrategy {
 			[1, -1], // down-left
 			[-1, -1], // up-left
 			[-1, 1], // up-right
-		];
+		]
 
-		let row = 0;
-		let col = 0;
-		visited[row * width + col] = true;
+		let row = 0
+		let col = 0
+		visited[row * width + col] = true
 
 		for (let i = 0; i < height * width; i++) {
-			const idx = row * width + col;
-			const oldPixel = imageArray[idx] + error;
-			const newPixel = Math.round(oldPixel / scale) * scale;
-			error = oldPixel - newPixel;
-			imageArray[idx] = newPixel;
+			const idx = row * width + col
+			const oldPixel = imageArray[idx] + error
+			const newPixel = Math.round(oldPixel / scale) * scale
+			error = oldPixel - newPixel
+			imageArray[idx] = newPixel
 
 			// Find next unvisited pixel in spiral pattern
 			for (const [dr, dc] of spiralDirections) {
-				const newRow = row + dr;
-				const newCol = col + dc;
-				const newIdx = newRow * width + newCol;
+				const newRow = row + dr
+				const newCol = col + dc
+				const newIdx = newRow * width + newCol
 
 				if (
 					newRow >= 0 &&
@@ -47,17 +47,17 @@ export class RiemersmaDithering implements DitheringStrategy {
 					newCol < width &&
 					!visited[newIdx]
 				) {
-					row = newRow;
-					col = newCol;
-					visited[newIdx] = true;
-					break;
+					row = newRow
+					col = newCol
+					visited[newIdx] = true
+					break
 				}
 			}
 		}
 
 		// Clamp values to 0-255 range
 		for (let i = 0; i < imageArray.length; i++) {
-			imageArray[i] = Math.max(0, Math.min(255, imageArray[i]));
+			imageArray[i] = Math.max(0, Math.min(255, imageArray[i]))
 		}
 	}
 }

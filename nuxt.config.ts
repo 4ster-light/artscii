@@ -1,5 +1,6 @@
-import tailwindcss from "@tailwindcss/vite";
-import { defineNuxtConfig } from "nuxt/config";
+import tailwindcss from "@tailwindcss/vite"
+import { defineNuxtConfig } from "nuxt/config"
+import type { PluginOption } from "vite"
 
 export default defineNuxtConfig({
 	compatibilityDate: "2024-11-01",
@@ -10,11 +11,11 @@ export default defineNuxtConfig({
 	modules: ["@pinia/nuxt"],
 	css: ["./assets/css/global.css"],
 	vite: {
-		plugins: [tailwindcss()],
+		plugins: [tailwindcss() as PluginOption],
 	},
 	nitro: {
 		output: {
 			dir: "dist",
 		},
 	},
-});
+})

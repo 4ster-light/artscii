@@ -1,26 +1,26 @@
-import { AtkinsonDithering } from "./atkinson";
-import type { DitheringStrategy } from "./ditheringStrategy";
-import { FloydSteinbergDithering } from "./floydSteinberg";
-import { RiemersmaDithering } from "./riemersma";
+import { AtkinsonDithering } from "./atkinson"
+import type { DitheringStrategy } from "./ditheringStrategy"
+import { FloydSteinbergDithering } from "./floydSteinberg"
+import { RiemersmaDithering } from "./riemersma"
 
 export const availableStrategies = [
 	{ value: "none", label: "No Dithering" },
 	{ value: "atkinson", label: "Atkinson" },
 	{ value: "floyd-steinberg", label: "Floyd-Steinberg" },
 	{ value: "riemersma", label: "Riemersma" },
-] as const;
+] as const
 
 export function getDitheringStrategy(name: string): DitheringStrategy | null {
 	switch (name) {
 		case "atkinson":
-			return new AtkinsonDithering();
+			return new AtkinsonDithering()
 		case "floyd-steinberg":
-			return new FloydSteinbergDithering();
+			return new FloydSteinbergDithering()
 		case "riemersma":
-			return new RiemersmaDithering();
+			return new RiemersmaDithering()
 		case "none":
-			return null;
+			return null
 		default:
-			return null;
+			return null
 	}
 }

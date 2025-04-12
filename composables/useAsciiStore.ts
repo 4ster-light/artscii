@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
-import { processImage } from "../utils/asciiConverter";
-import { getDitheringStrategy } from "../utils/dithering/utils";
+import { defineStore } from "pinia"
+import { processImage } from "../utils/asciiConverter"
+import { getDitheringStrategy } from "../utils/dithering/utils"
 
 export const useAsciiStore = defineStore("ascii", {
 	state: () => ({
@@ -17,16 +17,16 @@ export const useAsciiStore = defineStore("ascii", {
 
 	actions: {
 		async setImage(dataUrl: string) {
-			this.imageData = dataUrl;
-			await this.generateAscii();
+			this.imageData = dataUrl
+			await this.generateAscii()
 		},
 
 		async generateAscii() {
-			if (!this.imageData) return;
+			if (!this.imageData) return
 
-			this.isProcessing = true;
+			this.isProcessing = true
 			try {
-				const ditheringStrategy = getDitheringStrategy(this.ditheringStrategy);
+				const ditheringStrategy = getDitheringStrategy(this.ditheringStrategy)
 				this.asciiArt = await processImage(
 					this.imageData,
 					this.resolution,
@@ -35,12 +35,12 @@ export const useAsciiStore = defineStore("ascii", {
 					this.inverted,
 					this.coloredAscii,
 					ditheringStrategy,
-				);
+				)
 			} catch (error) {
-				console.error("Error generating ASCII art:", error);
+				console.error("Error generating ASCII art:", error)
 			} finally {
-				this.isProcessing = false;
+				this.isProcessing = false
 			}
 		},
 	},
-});
+})
