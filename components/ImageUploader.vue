@@ -1,34 +1,34 @@
 <script setup lang="ts">
-const store = useAsciiStore();
-const fileInput = ref<HTMLInputElement | null>(null);
+const store = useAsciiStore()
+const fileInput = ref<HTMLInputElement | null>(null)
 
 function triggerFileInput() {
-	fileInput.value?.click();
+	fileInput.value?.click()
 }
 
 function handleFileSelect(event: Event) {
-	const target = event.target as HTMLInputElement;
+	const target = event.target as HTMLInputElement
 	if (target.files?.[0]) {
-		processFile(target.files[0]);
+		processFile(target.files[0])
 	}
 }
 
 function handleDrop(event: DragEvent) {
-	const file = event.dataTransfer?.files[0];
+	const file = event.dataTransfer?.files[0]
 	if (file) {
-		processFile(file);
+		processFile(file)
 	}
 }
 
 function processFile(file: File) {
-	const reader = new FileReader();
+	const reader = new FileReader()
 	reader.onload = (e) => {
-		const result = e.target?.result;
+		const result = e.target?.result
 		if (typeof result === "string") {
-			store.setImage(result);
+			store.setImage(result)
 		}
-	};
-	reader.readAsDataURL(file);
+	}
+	reader.readAsDataURL(file)
 }
 </script>
 

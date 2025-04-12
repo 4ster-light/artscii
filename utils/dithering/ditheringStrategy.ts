@@ -4,5 +4,5 @@ export interface DitheringStrategy {
 		width: number,
 		height: number,
 		quantizationLevels: number,
-	): void;
+	): void
 }

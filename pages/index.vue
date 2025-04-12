@@ -10,7 +10,7 @@ useSeoMeta({
 	twitterDescription: "The best image to ascii art converter",
 	twitterImage: "/Icon.svg",
 	twitterCard: "summary",
-});
+})
 
 useHead({
 	htmlAttrs: {
@@ -23,7 +23,7 @@ useHead({
 			href: "/Icon.svg",
 		},
 	],
-});
+})
 </script>
 
 <template>
