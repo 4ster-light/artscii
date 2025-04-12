@@ -9,6 +9,7 @@ lerna-debug.log*
 
 .vite
 .output
+.nuxt
 node_modules
 dist
 dist-ssr
