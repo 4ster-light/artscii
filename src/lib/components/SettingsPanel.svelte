@@ -104,8 +104,8 @@
         disabled={ascii.isProcessing}
       >
         {#each availableStrategies as option}
-          <option value={option.value}>
-            {option.label}
+          <option value={option}>
+            {option}
           </option>
         {/each}
       </select>
