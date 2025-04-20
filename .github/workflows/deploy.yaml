@@ -33,5 +33,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "artscii"
-          entrypoint: "server/index.mjs"
-          root: "dist"
+          entrypoint: "index.js"
+          root: "build"
