@@ -1,4 +1,4 @@
-import type { DitheringStrategy } from "./dithering/ditheringStrategy"
+import type { DitheringStrategy } from "./dithering/types"
 
 const ASCII_CHARS = " .,:;i1tfLCG08@"
 const ASCII_CHARS_INVERTED = "@80GCLft1i;:,. "
