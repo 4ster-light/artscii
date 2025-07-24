@@ -24,9 +24,8 @@ deno task build
 
 ## 📝 Contributing
 
-Contributions are welcome! You are free to submit any PR for review, only
-requirement is you run `deno task check` before submitting and not to expect to
-be merged quickly or at all if I (Aster) don't approve it.
+Contributions are welcome! You are free to submit any PR for review, only requirement is you run `deno task check`
+before submitting and not to expect to be merged quickly or at all if I (Aster) don't approve it.
 
 ## 📄 LICENSE
 

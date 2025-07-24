@@ -10,9 +10,7 @@ function createCanvas(width: number, height: number): HTMLCanvasElement {
   return canvas
 }
 
-function getPixelBrightness(r: number, g: number, b: number): number {
-  return Math.round(0.299 * r + 0.587 * g + 0.114 * b)
-}
+const getPixelBrightness = (r: number, g: number, b: number): number => Math.round(0.299 * r + 0.587 * g + 0.114 * b)
 
 function adjustPixel(
   value: number,
@@ -50,8 +48,6 @@ export function processImage(
           return
         }
 
-        console.log(ditheringStrategy)
-
         ctx.drawImage(img, 0, 0, width, height)
 
         const imageData = ctx.getImageData(0, 0, width, height)
@@ -61,45 +57,39 @@ export function processImage(
         const charCount = chars.length - 1
 
         const grayscale: number[] = new Array(width * height)
-        const colors: [number, number, number][] = colored
-          ? new Array(width * height)
-          : []
+        const colors: [number, number, number][] = colored ? new Array(width * height) : []
 
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const idx = (y * width + x) * 4
-            const [r, g, b] = [0, 1, 2].map((i) =>
-              adjustPixel(pixels[idx + i], contrast, brightness)
-            )
+            const [r, g, b] = [0, 1, 2].map((i) => adjustPixel(pixels[idx + i], contrast, brightness))
             const pixelBrightness = getPixelBrightness(r, g, b)
+
             grayscale[y * width + x] = pixelBrightness
+
             if (colored) colors[y * width + x] = [r, g, b]
           }
         }
 
-        if (ditheringStrategy) {
+        if (ditheringStrategy)
           ditheringStrategy.dithering(grayscale, width, height, charCount)
-        }
 
         let result = ""
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const i = y * width + x
             const value = grayscale[i]
-            const charIndex = Math.min(
-              chars.length - 1,
-              Math.floor((value / 255) * charCount),
-            )
+            const charIndex = Math.min(chars.length - 1, Math.floor((value / 255) * charCount))
             const char = chars[charIndex]
+
             if (colored) {
               const [r, g, b] = colors[i]
-              result += `<span style="color: rgb(${Math.round(r)},${
-                Math.round(g)
-              },${Math.round(b)})">${char}</span>`
+              result += `<span style="color: rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})">${char}</span>`
             } else {
               result += char
             }
           }
+
           result += colored ? "<br>" : "\n"
         }
 
@@ -109,10 +99,7 @@ export function processImage(
       }
     }
 
-    img.onerror = () => {
-      reject(new Error("Failed to load image"))
-    }
-
+    img.onerror = () => reject(new Error("Failed to load image"))
     img.src = imageUrl
   })
 }
