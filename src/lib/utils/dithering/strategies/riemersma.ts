@@ -31,6 +31,7 @@ export class RiemersmaDithering implements DitheringStrategy {
       const idx = row * width + col
       const oldPixel = imageArray[idx] + error
       const newPixel = Math.round(oldPixel / scale) * scale
+
       error = oldPixel - newPixel
       imageArray[idx] = newPixel
 
@@ -56,8 +57,7 @@ export class RiemersmaDithering implements DitheringStrategy {
     }
 
     // Clamp values to 0-255 range
-    for (let i = 0; i < imageArray.length; i++) {
+    for (let i = 0; i < imageArray.length; i++)
       imageArray[i] = Math.max(0, Math.min(255, imageArray[i]))
-    }
   }
 }

@@ -1,7 +1,7 @@
-<script>
-import AsciiOutput from "$lib/components/AsciiOutput.svelte";
-import ImageUploader from "$lib/components/ImageUploader.svelte";
-import SettingsPanel from "$lib/components/SettingsPanel.svelte";
+<script lang="ts">
+  import AsciiOutput from "$lib/components/AsciiOutput.svelte";
+  import ImageUploader from "$lib/components/ImageUploader.svelte";
+  import SettingsPanel from "$lib/components/SettingsPanel.svelte";
 </script>
 
 <main class="grow p-4 md:p-6 max-w-7xl mx-auto w-full">
