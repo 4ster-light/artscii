@@ -30,5 +30,3 @@ before submitting and not to expect to be merged quickly or at all if I (Aster) 
 ## 📄 LICENSE
 
 Apache License 2.0
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B41HVJUR)
