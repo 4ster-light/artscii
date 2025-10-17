@@ -4,8 +4,8 @@ The best free and open source ASCII Art generator.
 
 ## 📝 Contributing
 
-Contributions are welcome! You are free to submit any PR for review, only requirement is you run `deno task check`
-before submitting and do not to expect to be merged quickly or at all.
+Contributions are welcome! You are free to submit any PR for review, only requirement is you run
+`deno task check` before submitting and do not to expect to be merged quickly or at all.
 
 ### 🚀 Getting Started
 
