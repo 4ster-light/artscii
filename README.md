@@ -12,15 +12,36 @@ A fast, feature-rich command-line tool to convert images to ASCII art.
 
 ## Installation
 
-### From source
+### Prebuilt Binaries
 
-Clone the repository and:
+Download prebuilt binaries for your platform from the
+[latest release](https://github.com/4ster-light/artscii/releases/latest):
+
+- **Linux x86_64**: `artscii-linux-x86_64`
+- **Linux ARM64**: `artscii-linux-aarch64`
+- **macOS x86_64**: `artscii-macos-x86_64`
+- **macOS ARM64**: `artscii-macos-aarch64`
+- **Windows x86_64**: `artscii-windows-x86_64.exe`
+
+After downloading, make it executable (on Unix):
+
+```bash
+chmod +x artscii-linux-x86_64
+./artscii-linux-x86_64
+```
+
+### From Cargo
+
+Install from source using Cargo, clone the repository, and on the root of the
+project run:
 
 ```bash
 cargo install --path .
 ```
 
-### Build manually
+### Build Manually
+
+Clone the repository and build:
 
 ```bash
 cargo build --release # Binary will be at ./target/release/artscii
