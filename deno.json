@@ -1,7 +1,0 @@
-{
-  "fmt": {
-    "lineWidth": 120,
-    "semiColons": false,
-    "useBraces": "preferNone"
-  }
-}
