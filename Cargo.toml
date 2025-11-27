@@ -1,0 +1,19 @@
+[package]
+name = "artscii"
+version = "1.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Convert any image to ASCII art"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+keywords = ["ascii", "art", "image", "cli", "terminal"]
+categories = ["command-line-utilities", "multimedia::images"]
+
+[dependencies]
+clap = { version = "4.5.53", features = ["derive", "color"] }
+anyhow = "1.0.100"
+thiserror = "2.0.17"
+image = "0.25.9"
+colored = "3.0.0"
+crossterm = "0.29.0"
+html-escape = "0.2.13"
