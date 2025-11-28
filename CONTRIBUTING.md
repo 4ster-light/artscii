@@ -1,7 +1,6 @@
-# Contributing to ArtSCII
+# Contributing to ✰ArtSCII✰
 
-Thank you for your interest in contributing to ArtSCII! This document provides
-guidelines and instructions for contributing.
+> Thank you for your interest in contributing to **✰ArtSCII✰**
 
 ## Getting Started
 
@@ -160,4 +159,4 @@ any form of harrasment or discriminations.
 
 If you have questions, feel free to open an issue for discussion.
 
-Thank you for contributing! 🎨
+Thank you for contributing!
