@@ -1,4 +1,4 @@
-# 🎨 ✰ArtSCII✰ CLI
+# ✰ArtSCII✰ CLI (previously [✰ArtSCII✰](https://artscii.deno.dev))
 
 A fast, feature-rich command-line tool to convert images to ASCII art.
 
@@ -63,7 +63,7 @@ cargo build --release # Binary will be at ./target/release/artscii
 | `-d` | `--dithering`  | Dithering algorithm                | none    |
 | `-q` | `--quiet`      | Suppress info messages             | false   |
 
-#### Example Commands
+### Example Commands
 
 ```bash
 # Basic usage - display in terminal
