@@ -104,8 +104,6 @@ artscii image.png -q
 - **atkinson**: Sharper dithering (preserves more contrast)
 - **riemersma**: Space-filling curve dithering
 
-## Sponsor
+## License
 
-If you like this project, consider supporting me by buying me a coffee.
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B41HVJUR)
+MIT
