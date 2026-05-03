@@ -30,21 +30,22 @@ chmod +x artscii-linux-x86_64
 ./artscii-linux-x86_64
 ```
 
-### From Cargo
+### Using Nix
 
-Install from source using Cargo, clone the repository, and on the root of the
-project run:
+Install into your profile:
 
 ```bash
-cargo install --path .
+nix profile add github:4ster-light/artscii
 ```
 
-### Build Manually
+Or add to your system configuration if using NixOS.
 
-Clone the repository and build:
+### Cargo
+
+Install from source using Cargo, directly from the repository:
 
 ```bash
-cargo build --release # Binary will be at ./target/release/artscii
+cargo install --git https://github.com/4ster-light/artscii
 ```
 
 ## Usage
@@ -67,34 +68,34 @@ cargo build --release # Binary will be at ./target/release/artscii
 
 ```bash
 # Basic usage - display in terminal
-artscii image.png
+artscii image.jpg
 
 # With colors
-artscii image.png -c
+artscii image.jpg -c
 
 # Save as plain text
-artscii image.png -o output.txt
+artscii image.jpg -o output.txt
 
 # Save as styled HTML with colors
-artscii image.png -o output.html -c
+artscii image.jpg -o output.html -c
 
 # Higher resolution with Atkinson dithering
-artscii image.png -r 0.5 -d atkinson
+artscii image.jpg -r 0.5 -d atkinson
 
 # Adjust contrast and brightness
-artscii image.png --contrast 1.5 -b 0.8
+artscii image.jpg --contrast 1.5 -b 0.8
 
 # Invert characters (for light backgrounds)
-artscii image.png -i
+artscii image.jpg -i
 
 # Quiet mode (only output the art)
-artscii image.png -q
+artscii image.jpg -q
 ```
 
-> And what I think is the best result for the example image:
+> And what I think is the best result for the example image in this repo:
 >
 > ```bash
-> artscii image.png -c -b 1.5 -r 0.26 -d atkinson -o img.html
+> artscii image.jpg -c -b 1.5 -r 0.26 -d atkinson -o img.html
 > ```
 
 ### Dithering Algorithms
