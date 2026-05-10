@@ -1,0 +1,20 @@
+[package]
+name = "artscii-cli"
+version = "1.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Command-line interface for ArtSCII"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+keywords = ["ascii", "art", "image", "cli", "terminal"]
+categories = ["command-line-utilities", "multimedia::images"]
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.53", features = ["derive", "color"] }
+colored = "3.0.0"
+artscii-img = { path = "../artscii-img", features = ["cli"] }
+
+[[bin]]
+name = "artscii"
+path = "src/main.rs"

@@ -2,9 +2,6 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ArtsciiError {
-    #[error("Failed to load image: {0}")]
-    ImageLoad(#[from] image::ImageError),
-
     #[error("Failed to read file: {0}")]
     FileRead(#[from] std::io::Error),
 

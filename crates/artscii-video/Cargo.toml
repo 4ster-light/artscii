@@ -1,0 +1,13 @@
+[package]
+name = "artscii-video"
+version = "1.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Video conversion scaffolding for ArtSCII"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+keywords = ["ascii", "art", "video", "library"]
+categories = ["multimedia::video"]
+
+[dependencies]
+artscii-core = { path = "../artscii-core" }

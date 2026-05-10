@@ -1,6 +1,7 @@
-# ✰ArtSCII✰ CLI (previously [✰ArtSCII✰](https://artscii.deno.dev))
+# ✰ArtSCII✰
 
-A fast, feature-rich command-line tool to convert images to ASCII art.
+A workspace with a shared foundation crate, a reusable image-conversion crate, a
+CLI binary, and video scaffolding.
 
 ## Features
 
@@ -9,6 +10,37 @@ A fast, feature-rich command-line tool to convert images to ASCII art.
 - **Multiple output formats**: Terminal, plain text, and styled HTML
 - **Image adjustments**: Resolution, contrast, and brightness controls
 - **Wide format support**: PNG, JPG, GIF, BMP, WebP, and more
+
+## Workspace
+
+- `crates/artscii-core`: shared config, errors, and strategy types
+- `crates/artscii-img`: image loading and ASCII conversion library
+- `crates/artscii-cli`: CLI binary
+- `crates/artscii-video`: future video conversion crate scaffold
+
+## Using the crate
+
+Use `artscii-img` from another Rust project as a local path dependency:
+
+```bash
+cargo add --path ../artscii/crates/artscii-img artscii-img
+# If you want to lock it to a branch, tag or commit:
+cargo add --git https://github.com/4ster-light/artscii --branch main artscii-img
+cargo add --git https://github.com/4ster-light/artscii --tag v1.0.0 artscii-img
+cargo add --git https://github.com/4ster-light/artscii --rev <commit-sha> artscii-img
+```
+
+Or, in `Cargo.toml`:
+
+```toml
+[dependencies]
+artscii-img = { git = "https://github.com/4ster-light/artscii", branch = "main" }
+```
+
+Same applies for `artscii-core` if you want to use the shared types and config,
+or `artscii-video`.
+
+The CLI crate builds the `artscii` binary.
 
 ## Installation
 
@@ -42,10 +74,10 @@ Or add to your system configuration if using NixOS.
 
 ### Cargo
 
-Install from source using Cargo, directly from the repository:
+Build and install the CLI from source:
 
 ```bash
-cargo install --git https://github.com/4ster-light/artscii
+cargo install --git https://github.com/4ster-light/artscii --branch main artscii-cli
 ```
 
 ## Usage

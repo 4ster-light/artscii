@@ -2,11 +2,11 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::Path;
 
-use crate::cli::OutputFormat;
-use crate::converter::AsciiResult;
-use crate::error::Result;
+use artscii_img::AsciiResult;
 
-/// Write ASCII art to the appropriate output
+use crate::cli::OutputFormat;
+use anyhow::Result;
+
 pub fn write_output(
     result: &AsciiResult,
     format: OutputFormat,
@@ -52,7 +52,6 @@ pub fn write_output(
     Ok(())
 }
 
-/// Print a styled header (for non-quiet mode)
 pub fn print_header(input_path: &Path) {
     use colored::Colorize;
 
@@ -69,7 +68,6 @@ pub fn print_header(input_path: &Path) {
     eprintln!();
 }
 
-/// Print processing info
 pub fn print_info(width: usize, height: usize, colored: bool) {
     use colored::Colorize;
 

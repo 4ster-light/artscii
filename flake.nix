@@ -1,5 +1,5 @@
 {
-  description = "✰ArtSCII✰ - ASCII art generator";
+  description = "✰ArtSCII✰ - ASCII art generator workspace";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -11,12 +11,13 @@
       let
         pkgs = import nixpkgs { inherit system; };
         artscii = pkgs.rustPlatform.buildRustPackage {
-          pname = "artscii";
+          pname = "artscii-cli";
           version = "1.0.0";
-          src = ./.;
+          src = builtins.path { path = ./.; name = "artscii-src"; };
           cargoLock = {
             lockFile = ./Cargo.lock;
           };
+          cargoBuildFlags = [ "-p" "artscii-cli" ];
           doCheck = false;
           meta = with pkgs.lib; {
             description = "Convert any image to ASCII art";

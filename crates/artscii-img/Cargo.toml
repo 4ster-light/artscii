@@ -1,0 +1,21 @@
+[package]
+name = "artscii-img"
+version = "1.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Image conversion library for ArtSCII"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+keywords = ["ascii", "art", "image", "library"]
+categories = ["multimedia::images"]
+
+[dependencies]
+artscii-core = { path = "../artscii-core" }
+colored = "3.0.0"
+html-escape = "0.2.13"
+image = "0.25.9"
+thiserror = "2.0.17"
+
+[features]
+default = []
+cli = ["artscii-core/cli"]

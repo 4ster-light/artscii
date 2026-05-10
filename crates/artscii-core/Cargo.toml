@@ -1,0 +1,18 @@
+[package]
+name = "artscii-core"
+version = "1.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Shared foundation for ArtSCII crates"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+keywords = ["ascii", "art", "shared", "library"]
+categories = ["multimedia"]
+
+[dependencies]
+thiserror = "2.0.17"
+clap = { version = "4.5.53", features = ["derive", "color"], optional = true }
+
+[features]
+default = []
+cli = ["dep:clap"]

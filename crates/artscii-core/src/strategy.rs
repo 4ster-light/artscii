@@ -1,6 +1,8 @@
+#[cfg(feature = "cli")]
 use clap::ValueEnum;
 
-#[derive(Debug, Clone, Copy, Default, ValueEnum)]
+#[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "cli", derive(ValueEnum))]
 pub enum DitheringStrategy {
     #[default]
     None,
@@ -20,8 +22,6 @@ impl DitheringStrategy {
     }
 }
 
-/// Floyd-Steinberg dithering algorithm
-/// Distributes quantization error to neighboring pixels with weights: 7/16, 3/16, 5/16, 1/16
 fn floyd_steinberg(image: &mut [f32], width: usize, height: usize, levels: usize) {
     let scale = 255.0 / (levels - 1) as f32;
 
@@ -35,7 +35,6 @@ fn floyd_steinberg(image: &mut [f32], width: usize, height: usize, levels: usize
 
             image[i] = new_pixel;
 
-            // Distribute error to neighbors
             if x + 1 < width {
                 image[y * width + (x + 1)] += error * 7.0 / 16.0;
             }
@@ -51,14 +50,11 @@ fn floyd_steinberg(image: &mut [f32], width: usize, height: usize, levels: usize
         }
     }
 
-    // Clamp values
     for pixel in image.iter_mut() {
         *pixel = pixel.clamp(0.0, 255.0);
     }
 }
 
-/// Atkinson dithering algorithm
-/// Distributes 6/8 of error to 6 neighboring pixels (loses 1/4 of error for sharper result)
 fn atkinson(image: &mut [f32], width: usize, height: usize, levels: usize) {
     let scale = 255.0 / (levels - 1) as f32;
 
@@ -73,7 +69,6 @@ fn atkinson(image: &mut [f32], width: usize, height: usize, levels: usize) {
 
             image[i] = new_pixel;
 
-            // Distribute error to 6 neighbors (1/8 each, total 6/8)
             if x + 1 < width {
                 image[y * width + (x + 1)] += error_fraction;
             }
@@ -95,30 +90,26 @@ fn atkinson(image: &mut [f32], width: usize, height: usize, levels: usize) {
         }
     }
 
-    // Clamp values
     for pixel in image.iter_mut() {
         *pixel = pixel.clamp(0.0, 255.0);
     }
 }
 
-/// Riemersma dithering algorithm
-/// Uses a space-filling curve to distribute error along a path
 fn riemersma(image: &mut [f32], width: usize, height: usize, levels: usize) {
     let scale = 255.0 / (levels - 1) as f32;
     let total_pixels = width * height;
     let mut visited = vec![false; total_pixels];
     let mut error = 0.0f32;
 
-    // Spiral directions (8-connected neighborhood)
     let directions: [(i32, i32); 8] = [
-        (0, 1),   // right
-        (1, 0),   // down
-        (0, -1),  // left
-        (-1, 0),  // up
-        (1, 1),   // down-right
-        (1, -1),  // down-left
-        (-1, -1), // up-left
-        (-1, 1),  // up-right
+        (0, 1),
+        (1, 0),
+        (0, -1),
+        (-1, 0),
+        (1, 1),
+        (1, -1),
+        (-1, -1),
+        (-1, 1),
     ];
 
     let mut row: i32 = 0;
@@ -133,7 +124,6 @@ fn riemersma(image: &mut [f32], width: usize, height: usize, levels: usize) {
         error = old_pixel - new_pixel;
         image[idx] = new_pixel;
 
-        // Find next unvisited pixel in spiral pattern
         for &(dr, dc) in &directions {
             let new_row = row + dr;
             let new_col = col + dc;
@@ -150,7 +140,6 @@ fn riemersma(image: &mut [f32], width: usize, height: usize, levels: usize) {
         }
     }
 
-    // Clamp values
     for pixel in image.iter_mut() {
         *pixel = pixel.clamp(0.0, 255.0);
     }
