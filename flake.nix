@@ -11,7 +11,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         artscii = pkgs.rustPlatform.buildRustPackage {
-          pname = "artscii-cli";
+          pname = "artscii";
           version = "1.0.0";
           src = builtins.path { path = ./.; name = "artscii-src"; };
           cargoLock = {
