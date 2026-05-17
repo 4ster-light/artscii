@@ -24,7 +24,11 @@ pub fn write_output(
             io::stdout().flush()?;
         }
         OutputFormat::Text => {
-            let output = result.to_plain_text();
+            let output = if result.colored {
+                result.to_ansi()
+            } else {
+                result.to_plain_text()
+            };
             if let Some(path) = output_path {
                 fs::write(path, &output)?;
                 if !quiet {

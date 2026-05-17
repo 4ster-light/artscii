@@ -18,7 +18,7 @@ pub enum OutputFormat {
     version,
     about = "Convert images to beautiful ASCII art",
     long_about = None,
-    after_help = "Examples:\n  artscii image.png                      # Display in terminal\n  artscii image.png -c                   # Display with colors\n  artscii image.png -o art.txt           # Save as text file\n  artscii image.png -o art.html -c       # Save as colored HTML\n  artscii image.png -r 0.5 -d atkinson   # Higher resolution with Atkinson dithering"
+    after_help = "Examples:\n  artscii image.png                      # Display in terminal\n  artscii image.png -c                   # Display with colors\n  artscii image.png -c -o art.txt        # Save ANSI-colored text\n  artscii image.png -o art.txt           # Save as plain text\n  artscii image.png -o art.html -c       # Save as colored HTML\n  artscii image.png -r 0.5 -d atkinson   # Higher resolution with Atkinson dithering"
 )]
 pub struct Cli {
     #[arg(value_name = "IMAGE")]

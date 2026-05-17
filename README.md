@@ -6,8 +6,8 @@ CLI binary, and video scaffolding.
 ## Features
 
 - **Multiple dithering algorithms**: Floyd-Steinberg, Atkinson, and Riemersma
-- **Color support**: ANSI colors for terminal, RGB for HTML output
-- **Multiple output formats**: Terminal, plain text, and styled HTML
+- **Color support**: ANSI colors for terminal and text output, RGB for HTML output
+- **Multiple output formats**: Terminal, plain text, colorized text, and styled HTML
 - **Image adjustments**: Resolution, contrast, and brightness controls
 - **Wide format support**: PNG, JPG, GIF, BMP, WebP, and more
 
@@ -25,8 +25,7 @@ Use `artscii-img` from another Rust project as a local path dependency:
 ```bash
 cargo add --path ../artscii/crates/artscii-img artscii-img
 # If you want to lock it to a branch, tag or commit:
-cargo add --git https://github.com/4ster-light/artscii --branch main artscii-img
-cargo add --git https://github.com/4ster-light/artscii --tag v1.0.0 artscii-img
+cargo add --git https://github.com/4ster-light/artscii --tag v1.1.0 artscii-img
 cargo add --git https://github.com/4ster-light/artscii --rev <commit-sha> artscii-img
 ```
 
@@ -77,7 +76,7 @@ Or add to your system configuration if using NixOS.
 Build and install the CLI from source:
 
 ```bash
-cargo install --git https://github.com/4ster-light/artscii --branch main artscii-cli
+cargo install --git https://github.com/4ster-light/artscii --tag v1.1.0 artscii-cli
 ```
 
 ## Usage
@@ -107,6 +106,9 @@ artscii image.jpg -c
 
 # Save as plain text
 artscii image.jpg -o output.txt
+
+# Save ANSI-colored text
+artscii image.jpg -c -o output.txt
 
 # Save as styled HTML with colors
 artscii image.jpg -o output.html -c

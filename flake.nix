@@ -12,7 +12,7 @@
         pkgs = import nixpkgs { inherit system; };
         artscii = pkgs.rustPlatform.buildRustPackage {
           pname = "artscii";
-          version = "1.0.0";
+          version = "1.1.0";
           src = builtins.path { path = ./.; name = "artscii-src"; };
           cargoLock = {
             lockFile = ./Cargo.lock;
