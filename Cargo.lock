@@ -107,7 +107,7 @@ checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
 name = "artscii-cli"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "artscii-img",
@@ -117,7 +117,7 @@ dependencies = [
 
 [[package]]
 name = "artscii-core"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "clap",
  "thiserror",
@@ -125,7 +125,7 @@ dependencies = [
 
 [[package]]
 name = "artscii-img"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "artscii-core",
  "colored",
@@ -136,7 +136,7 @@ dependencies = [
 
 [[package]]
 name = "artscii-video"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "artscii-core",
 ]
