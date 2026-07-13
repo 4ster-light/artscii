@@ -1,14 +1,23 @@
-use artscii_core::ConvertConfig;
+use std::path::Path;
 
-#[derive(Debug, Clone)]
+use anyhow::Result;
+use artscii_img::AsciiResult;
+
+use crate::config::{VideoConfig, VideoOutputMode};
+
+#[derive(Debug)]
 pub struct FrameConversion {
     pub frame_index: usize,
-    pub config: ConvertConfig,
+    pub ascii: AsciiResult,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct VideoConversion {
+    pub input: std::path::PathBuf,
     pub frames: Vec<FrameConversion>,
+    pub output_mode: VideoOutputMode,
+    pub preserve_audio: bool,
+    pub frame_rate: Option<(i32, i32)>,
 }
 
 impl Default for VideoConversion {
@@ -19,6 +28,20 @@ impl Default for VideoConversion {
 
 impl VideoConversion {
     pub fn new() -> Self {
-        Self { frames: Vec::new() }
+        Self {
+            input: std::path::PathBuf::new(),
+            frames: Vec::new(),
+            output_mode: VideoOutputMode::Terminal,
+            preserve_audio: false,
+            frame_rate: None,
+        }
     }
+}
+
+pub fn convert_video(config: &VideoConfig) -> Result<VideoConversion> {
+    crate::decoder::decode_video(config)
+}
+
+pub fn render_video(conversion: &VideoConversion, output: Option<&Path>) -> Result<()> {
+    crate::encoder::encode_video(conversion, output)
 }

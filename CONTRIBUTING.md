@@ -13,8 +13,9 @@ nix flake check
 nix build
 ```
 
-Note: `nix build` only sees files that are included in the flake source, so new
-workspace files must be tracked before it can see them.
+> [!NOTE]
+> `nix build` only sees files that are included in the flake source, so new
+> workspace files must be tracked before it can see them.
 
 If you are already in the dev shell, these are also useful:
 

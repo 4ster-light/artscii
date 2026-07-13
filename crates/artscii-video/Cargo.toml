@@ -1,9 +1,9 @@
 [package]
 name = "artscii-video"
-version = "1.1.0"
+version = "2.0.0"
 edition = "2024"
 authors = ["4ster-light"]
-description = "Video conversion scaffolding for ArtSCII"
+description = "Video conversion library for ArtSCII"
 license = "MIT"
 repository = "https://github.com/4ster-light/artscii"
 keywords = ["ascii", "art", "video", "library"]
@@ -11,3 +11,14 @@ categories = ["multimedia::video"]
 
 [dependencies]
 artscii-core = { path = "../artscii-core" }
+artscii-img = { path = "../artscii-img" }
+anyhow = "1.0.100"
+cpal = "0.17.3"
+ffmpeg-next = "8.0.1"
+gif = "0.14.0"
+font8x8 = "0.3.1"
+image = "0.25.9"
+thiserror = "2.0.17"
+
+[features]
+default = []

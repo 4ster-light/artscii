@@ -2,6 +2,8 @@ use clap::{Parser, ValueEnum};
 use std::path::PathBuf;
 
 use artscii_img::DitheringStrategy;
+#[cfg(feature = "video")]
+use artscii_video::{VideoConfig, VideoOutputMode};
 
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum OutputFormat {
@@ -9,6 +11,14 @@ pub enum OutputFormat {
     Terminal,
     Text,
     Html,
+}
+
+#[derive(Debug, Clone, Copy, Default, ValueEnum)]
+pub enum VideoFormat {
+    #[default]
+    Terminal,
+    Gif,
+    Mp4,
 }
 
 #[derive(Parser, Debug)]
@@ -57,6 +67,12 @@ pub struct Cli {
     #[arg(long)]
     pub video: bool,
 
+    #[arg(long, value_enum, default_value = "terminal")]
+    pub video_format: VideoFormat,
+
+    #[arg(long)]
+    pub preserve_audio: bool,
+
     #[arg(short, long)]
     pub quiet: bool,
 }
@@ -78,5 +94,35 @@ impl Cli {
         }
 
         OutputFormat::Terminal
+    }
+
+    #[cfg(feature = "video")]
+    pub fn to_video_config(&self) -> VideoConfig {
+        let mut config = VideoConfig::new(&self.input);
+        config.output = self.output.clone();
+        config.mode = match self.video_format {
+            VideoFormat::Terminal => VideoOutputMode::Terminal,
+            VideoFormat::Gif => VideoOutputMode::Gif,
+            VideoFormat::Mp4 => VideoOutputMode::Mp4,
+        };
+        config.preserve_audio = self.preserve_audio;
+        config.convert.resolution = self.resolution;
+        config.convert.contrast = self.contrast;
+        config.convert.brightness = self.brightness;
+        config.convert.inverted = self.invert;
+        config.convert.colored = self.color;
+        config.convert.dithering = self.dithering;
+        config
+    }
+
+    pub fn to_convert_config(&self) -> artscii_img::ConvertConfig {
+        artscii_img::ConvertConfig {
+            resolution: self.resolution,
+            contrast: self.contrast,
+            brightness: self.brightness,
+            inverted: self.invert,
+            colored: self.color,
+            dithering: self.dithering,
+        }
     }
 }

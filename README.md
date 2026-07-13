@@ -6,8 +6,12 @@ CLI binary, and video scaffolding.
 ## Features
 
 - **Multiple dithering algorithms**: Floyd-Steinberg, Atkinson, and Riemersma
-- **Color support**: ANSI colors for terminal and text output, RGB for HTML output
-- **Multiple output formats**: Terminal, plain text, colorized text, and styled HTML
+- **Color support**: ANSI colors for terminal and text output, RGB for HTML
+  output
+- **Multiple output formats**: Terminal, plain text, colorized text, styled
+  HTML, GIF, and MP4
+- **Video to ASCII animation**: Convert video to animated ASCII in terminal,
+  GIF, or MP4
 - **Image adjustments**: Resolution, contrast, and brightness controls
 - **Wide format support**: PNG, JPG, GIF, BMP, WebP, and more
 
@@ -16,15 +20,16 @@ CLI binary, and video scaffolding.
 - `crates/artscii-core`: shared config, errors, and strategy types
 - `crates/artscii-img`: image loading and ASCII conversion library
 - `crates/artscii-cli`: CLI binary
-- `crates/artscii-video`: future video conversion crate scaffold
+- `crates/artscii-video`: video to ASCII conversion
 
 ## Using the crate
 
 Use `artscii-img` from another Rust project as a local path dependency:
 
 ```bash
-cargo add --path ../artscii/crates/artscii-img artscii-img
+cargo add --git https://github.com/4ster-light/artscii artscii-img
 # If you want to lock it to a branch, tag or commit:
+cargo add --git https://github.com/4ster-light/artscii --branch main artscii-img
 cargo add --git https://github.com/4ster-light/artscii --tag v1.1.0 artscii-img
 cargo add --git https://github.com/4ster-light/artscii --rev <commit-sha> artscii-img
 ```
@@ -61,6 +66,11 @@ chmod +x artscii-linux-x86_64
 ./artscii-linux-x86_64
 ```
 
+> [!NOTE]
+> Prebuilt binaries include image-to-ASCII conversion only. Video support
+> requires building from source (see [Building from Source](#building-from-source))
+> or using `nix build`.
+
 ### Using Nix
 
 Install into your profile:
@@ -76,24 +86,27 @@ Or add to your system configuration if using NixOS.
 Build and install the CLI from source:
 
 ```bash
-cargo install --git https://github.com/4ster-light/artscii --tag v1.1.0 artscii-cli
+cargo install --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
 ## Usage
 
 ### Options
 
-| Flag | Long           | Description                        | Default |
-| ---- | -------------- | ---------------------------------- | ------- |
-| `-o` | `--output`     | Output file path                   | stdout  |
-| `-f` | `--format`     | Output format (terminal/text/html) | auto    |
-| `-r` | `--resolution` | Scale factor (0.01-1.0)            | 0.3     |
-|      | `--contrast`   | Contrast (0.1-3.0)                 | 1.0     |
-| `-b` | `--brightness` | Brightness (0.1-3.0)               | 1.0     |
-| `-i` | `--invert`     | Invert character mapping           | false   |
-| `-c` | `--color`      | Enable colored output              | false   |
-| `-d` | `--dithering`  | Dithering algorithm                | none    |
-| `-q` | `--quiet`      | Suppress info messages             | false   |
+| Flag | Long               | Description                         | Default  |
+| ---- | ------------------ | ----------------------------------- | -------- |
+| `-o` | `--output`         | Output file path                    | stdout   |
+| `-f` | `--format`         | Output format (terminal/text/html)  | auto     |
+| `-r` | `--resolution`     | Scale factor (0.01-1.0)             | 0.3      |
+|      | `--contrast`       | Contrast (0.1-3.0)                  | 1.0      |
+| `-b` | `--brightness`     | Brightness (0.1-3.0)                | 1.0      |
+| `-i` | `--invert`         | Invert character mapping            | false    |
+| `-c` | `--color`          | Enable colored output               | false    |
+| `-d` | `--dithering`      | Dithering algorithm                 | none     |
+| `-q` | `--quiet`          | Suppress info messages              | false    |
+|      | `--video`          | Enable video mode                   | false    |
+|      | `--video-format`   | Video output (terminal/gif/mp4)     | terminal |
+|      | `--preserve-audio` | Keep original audio in output files | false    |
 
 ### Example Commands
 
@@ -124,6 +137,18 @@ artscii image.jpg -i
 
 # Quiet mode (only output the art)
 artscii image.jpg -q
+
+# Play video as ASCII animation in terminal
+artscii video.mp4 --video
+
+# Play video in terminal with colors
+artscii video.mp4 --video -c
+
+# Export video as animated GIF (colored, higher resolution)
+artscii video.mp4 --video --video-format gif -c -r 0.5 -o output.gif
+
+# Export video as MP4 (colored, with original audio)
+artscii video.mp4 --video --video-format mp4 -c --preserve-audio -o output.mp4
 ```
 
 > And what I think is the best result for the example image in this repo:
@@ -138,6 +163,28 @@ artscii image.jpg -q
 - **floyd-steinberg**: Classic error-diffusion dithering
 - **atkinson**: Sharper dithering (preserves more contrast)
 - **riemersma**: Space-filling curve dithering
+
+## Building from Source
+
+Building from source requires system libraries for video and audio support.
+
+### Dependencies
+
+| Platform | Required packages                                                                                         |
+| -------- | --------------------------------------------------------------------------------------------------------- |
+| Nix      | `nix develop` (all dependencies provided by the flake)                                                    |
+| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel`                                                                 |
+| Debian   | `libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libasound2-dev libclang-dev` |
+| Arch     | `ffmpeg alsa-lib clang`                                                                                   |
+| macOS    | `brew install ffmpeg` (Alsa not needed)                                                                   |
+
+```bash
+# Using Nix (recommended)
+nix build
+
+# Or install deps manually then:
+cargo build --release
+```
 
 ## License
 

@@ -4,13 +4,29 @@ mod output;
 use anyhow::{Context, Result};
 use clap::Parser;
 
-use artscii_img::{ConvertConfig, convert_image, load_image};
+use artscii_img::{convert_image, load_image};
+#[cfg(feature = "video")]
+use artscii_video::{convert_video, render_video};
 
 use cli::Cli;
 use output::{print_header, print_info, write_output};
 
 fn main() -> Result<()> {
     let args = Cli::parse();
+
+    if args.video {
+        #[cfg(feature = "video")]
+        {
+            let config = args.to_video_config();
+            let conversion = convert_video(&config).context("Failed to convert video to ASCII")?;
+            render_video(&conversion, args.output.as_deref()).context("Failed to render video")?;
+            return Ok(());
+        }
+        #[cfg(not(feature = "video"))]
+        anyhow::bail!(
+            "Video support was not compiled in this build. Rebuild with the 'video' feature, or use 'nix build'."
+        );
+    }
 
     if !args.quiet {
         print_header(&args.input);
@@ -19,14 +35,7 @@ fn main() -> Result<()> {
     let img = load_image(&args.input)
         .with_context(|| format!("Failed to load image: {}", args.input.display()))?;
 
-    let config = ConvertConfig {
-        resolution: args.resolution,
-        contrast: args.contrast,
-        brightness: args.brightness,
-        inverted: args.invert,
-        colored: args.color,
-        dithering: args.dithering,
-    };
+    let config = args.to_convert_config();
 
     let result = convert_image(&img, &config).context("Failed to convert image to ASCII")?;
 
