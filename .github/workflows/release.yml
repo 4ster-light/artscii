@@ -16,34 +16,29 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            use_cross: false
-            artifact_name: artscii
-            asset_name: artscii-linux-x86_64
+            target: x86_64-unknown-linux-gnu
+            asset_name: artscii-linux-x86_64.tar.gz
+            bundle_libs: true
 
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-            use_cross: true
-            artifact_name: artscii
-            asset_name: artscii-linux-aarch64
-
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            use_cross: false
-            artifact_name: artscii
-            asset_name: artscii-macos-x86_64
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            asset_name: artscii-linux-aarch64.tar.gz
+            bundle_libs: true
 
           - os: macos-latest
             target: aarch64-apple-darwin
-            use_cross: false
-            artifact_name: artscii
             asset_name: artscii-macos-aarch64
+            bundle_libs: false
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            asset_name: artscii-macos-x86_64
+            bundle_libs: false
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            use_cross: false
-            artifact_name: artscii.exe
             asset_name: artscii-windows-x86_64.exe
+            bundle_libs: false
 
     steps:
       - uses: actions/checkout@v4
@@ -56,27 +51,96 @@ jobs:
         with:
           key: ${{ matrix.target }}
 
-      - name: Install cross
-        if: matrix.use_cross
-        run: cargo install cross
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y patchelf \
+            libavcodec-dev \
+            libavformat-dev \
+            libavutil-dev \
+            libavfilter-dev \
+            libavdevice-dev \
+            libswscale-dev \
+            libswresample-dev \
+            libasound2-dev
+
+      - name: Install system dependencies (macOS aarch64)
+        if: runner.os == 'macOS' && matrix.target == 'aarch64-apple-darwin'
+        run: |
+          brew install ffmpeg
+          prefix=$(brew --prefix ffmpeg)
+          echo "FFMPEG_LIB_DIR=${prefix}/lib" >> $GITHUB_ENV
+          echo "FFMPEG_INCLUDE_DIR=${prefix}/include" >> $GITHUB_ENV
+
+      - name: Install system dependencies (macOS x86_64)
+        if: runner.os == 'macOS' && matrix.target == 'x86_64-apple-darwin'
+        run: |
+          softwareupdate --install-rosetta --agree-to-license 2>/dev/null || true
+          if ! arch -x86_64 /usr/local/bin/brew --version &>/dev/null; then
+            arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/null
+          fi
+          arch -x86_64 /usr/local/bin/brew install ffmpeg
+          echo "FFMPEG_LIB_DIR=/usr/local/opt/ffmpeg/lib" >> $GITHUB_ENV
+          echo "FFMPEG_INCLUDE_DIR=/usr/local/opt/ffmpeg/include" >> $GITHUB_ENV
+          echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
+          echo "PKG_CONFIG_SYSROOT_DIR=/usr/local" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=/usr/local/opt/ffmpeg/lib/pkgconfig" >> $GITHUB_ENV
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install llvm -y --no-progress
+          $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z"
+          curl -L -o ffmpeg.7z $url
+          $ffDir = "$env:RUNNER_TEMP\ffmpeg"
+          7z x ffmpeg.7z "-o$ffDir" -y
+          $devDir = Get-ChildItem "$ffDir\ffmpeg-*" | Select-Object -First 1
+          "FFMPEG_DIR=$($devDir.FullName)" >> $env:GITHUB_ENV
+          "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
 
       - name: Build
-        run: |
-          if [ "${{ matrix.use_cross }}" = "true" ]; then
-            cross build --release --no-default-features --target ${{ matrix.target }}
-          else
-            cargo build --release --no-default-features --target ${{ matrix.target }}
-          fi
+        run: cargo build --release -p artscii-cli --features video --target ${{ matrix.target }}
         shell: bash
 
       - name: Strip binary (Unix)
-        if: runner.os != 'Windows' && !matrix.use_cross
+        if: runner.os != 'Windows'
+        run: strip target/${{ matrix.target }}/release/artscii
+
+      - name: Bundle runtime libraries (Linux)
+        if: matrix.bundle_libs
         run: |
-          strip target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          set -e
+          exe="target/${{ matrix.target }}/release/artscii"
+          mkdir -p dist
+          cp "$exe" dist/artscii
+
+          SYS_LIBS='linux-vdso|ld-linux|libc\.so|libm\.so|libpthread|libdl\.so|librt\.so|libgcc_s|libstdc\+\+|libresolv|libnss_|libselinux|libpcre'
+
+          bundle_libs() {
+            for lib in $(ldd "$1" 2>/dev/null | awk '/=> \// {print $3}'); do
+              local name=$(basename "$lib")
+              if echo "$name" | grep -qE "$SYS_LIBS"; then continue; fi
+              if [ -f "dist/$name" ]; then continue; fi
+              cp "$lib" "dist/"
+              bundle_libs "dist/$name"
+            done
+          }
+
+          bundle_libs dist/artscii
+          patchelf --set-rpath '$ORIGIN' dist/artscii
+          for so in dist/*.so*; do
+            patchelf --set-rpath '$ORIGIN' "$so" 2>/dev/null || true
+          done
+          tar czf "${{ matrix.asset_name }}" -C dist .
 
       - name: Prepare assets
+        if: matrix.bundle_libs == false
         run: |
-          cp target/${{ matrix.target }}/release/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+          EXT=""
+          [ "${{ runner.os }}" = "Windows" ] && EXT=".exe"
+          cp "target/${{ matrix.target }}/release/artscii${EXT}" "${{ matrix.asset_name }}"
         shell: bash
 
       - name: Upload Release Asset

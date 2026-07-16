@@ -59,17 +59,21 @@ Download prebuilt binaries for your platform from the
 - **macOS ARM64**: `artscii-macos-aarch64`
 - **Windows x86_64**: `artscii-windows-x86_64.exe`
 
-After downloading, make it executable (on Unix):
+After downloading, extract and run (on Linux / Unix):
 
 ```bash
-chmod +x artscii-linux-x86_64
-./artscii-linux-x86_64
+# Linux (tar.gz with bundled libraries)
+tar xzf artscii-linux-x86_64.tar.gz
+./artscii --help
+
+# macOS / Windows
+chmod +x artscii-macos-x86_64
+./artscii-macos-x86_64
 ```
 
 > [!NOTE]
-> Prebuilt binaries include image-to-ASCII conversion only. Video support
-> requires building from source (see [Building from Source](#building-from-source))
-> or using `nix build`.
+> Linux tarballs bundle required ffmpeg/alsa libraries — no extra packages
+> needed at runtime. macOS and Windows include video support natively.
 
 ### Using Nix
 
@@ -170,13 +174,13 @@ Building from source requires system libraries for video and audio support.
 
 ### Dependencies
 
-| Platform | Required packages                                                                                         |
-| -------- | --------------------------------------------------------------------------------------------------------- |
-| Nix      | `nix develop` (all dependencies provided by the flake)                                                    |
-| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel`                                                                 |
+| Platform | Build dependencies                       |
+| -------- | ---------------------------------------- |
+| Nix      | `nix develop` (all deps included)        |
+| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel` |
 | Debian   | `libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libasound2-dev libclang-dev` |
-| Arch     | `ffmpeg alsa-lib clang`                                                                                   |
-| macOS    | `brew install ffmpeg` (Alsa not needed)                                                                   |
+| Arch     | `ffmpeg alsa-lib clang`                   |
+| macOS    | `brew install ffmpeg`                     |
 
 ```bash
 # Using Nix (recommended)
