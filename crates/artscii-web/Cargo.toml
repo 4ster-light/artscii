@@ -1,0 +1,44 @@
+[package]
+name = "artscii-web"
+version = "2.0.0"
+edition = "2024"
+authors = ["4ster-light"]
+description = "Web interface for ArtSCII - convert images to ASCII art in the browser"
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"
+
+[dependencies]
+# ArtSCII core functionality
+artscii-core = { path = "../artscii-core" }
+artscii-img = { path = "../artscii-img", default-features = false }
+
+# Leptos for reactive web UI
+leptos = { version = "0.8", features = ["csr"] }
+leptos_meta = "0.8"
+
+# Image processing
+image = "0.25"
+html-escape = "0.2"
+
+# WASM utilities
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "File",
+    "FileList",
+    "FileReader",
+    "HtmlInputElement",
+    "Blob",
+    "BlobPropertyBag",
+    "Url",
+    "DragEvent",
+    "DataTransfer",
+    "Clipboard",
+    "Navigator",
+    "Window",
+    "Document",
+] }
+
+# Utilities
+console_error_panic_hook = "0.1"

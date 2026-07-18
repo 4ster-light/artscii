@@ -7,7 +7,7 @@ use crate::error::{ArtsciiImgError, Result};
 const ASCII_CHARS: &str = " .,:;i1tfLCG08@";
 const ASCII_CHARS_INVERTED: &str = "@80GCLft1i;:,. ";
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AsciiResult {
     pub width: usize,
     pub height: usize,
@@ -30,6 +30,7 @@ impl AsciiResult {
         result
     }
 
+    #[cfg(feature = "cli")]
     pub fn to_ansi(&self) -> String {
         use colored::Colorize;
 

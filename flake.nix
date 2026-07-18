@@ -76,6 +76,8 @@
             pkg-config
             alsa-lib
             libclang
+            trunk
+            lld
           ];
           LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
         };

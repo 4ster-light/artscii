@@ -4,5 +4,6 @@ members = [
     "crates/artscii-img",
     "crates/artscii-cli",
     "crates/artscii-video",
+    "crates/artscii-web",
 ]
 resolver = "2"

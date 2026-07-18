@@ -11,11 +11,11 @@ categories = ["multimedia::images"]
 
 [dependencies]
 artscii-core = { path = "../artscii-core" }
-colored = "3.0.0"
+colored = { version = "3.0.0", optional = true }
 html-escape = "0.2.13"
 image = "0.25.9"
 thiserror = "2.0.17"
 
 [features]
 default = []
-cli = ["artscii-core/cli"]
+cli = ["artscii-core/cli", "colored"]
