@@ -14,13 +14,23 @@ CLI binary, and video scaffolding.
   GIF, or MP4
 - **Image adjustments**: Resolution, contrast, and brightness controls
 - **Wide format support**: PNG, JPG, GIF, BMP, WebP, and more
+- **Browser-based**: Convert images to ASCII art entirely client-side via
+  WebAssembly
 
 ## Workspace
 
-- `crates/artscii-core`: shared config, errors, and strategy types
-- `crates/artscii-img`: image loading and ASCII conversion library
-- `crates/artscii-cli`: CLI binary
-- `crates/artscii-video`: video to ASCII conversion
+The project is organized as a Cargo workspace with the following crates:
+
+| Crate                                   | Description                                     | Type          |
+| --------------------------------------- | ----------------------------------------------- | ------------- |
+| [`artscii-core`](crates/artscii-core)   | Shared config, errors, and dithering strategies | Library       |
+| [`artscii-img`](crates/artscii-img)     | Image loading and ASCII conversion              | Library       |
+| [`artscii-video`](crates/artscii-video) | Video decoding and ASCII encoding               | Library       |
+| [`artscii-web`](crates/artscii-web)     | Browser-based WASM converter                    | Binary (WASM) |
+| [`artscii-cli`](crates/artscii-cli)     | Command-line interface                          | Binary        |
+
+The three library crates (`core`, `img`, `video`) are designed to be usable from
+other Rust projects. See each crate's README for details.
 
 ## Using the crate
 
@@ -174,13 +184,13 @@ Building from source requires system libraries for video and audio support.
 
 ### Dependencies
 
-| Platform | Build dependencies                       |
-| -------- | ---------------------------------------- |
-| Nix      | `nix develop` (all deps included)        |
-| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel` |
+| Platform | Build dependencies                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------------------- |
+| Nix      | `nix develop` (all deps included)                                                                         |
+| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel`                                                                 |
 | Debian   | `libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libasound2-dev libclang-dev` |
-| Arch     | `ffmpeg alsa-lib clang`                   |
-| macOS    | `brew install ffmpeg`                     |
+| Arch     | `ffmpeg alsa-lib clang`                                                                                   |
+| macOS    | `brew install ffmpeg`                                                                                     |
 
 ```bash
 # Using Nix (recommended)

@@ -1,17 +1,32 @@
 #[cfg(feature = "cli")]
 use clap::ValueEnum;
 
+/// Dithering algorithm to apply before mapping brightness to characters.
+///
+/// Dithering reduces banding by distributing quantization error to
+/// neighbouring pixels, producing smoother-looking results at the cost
+/// of some CPU time.
 #[derive(Debug, Clone, Copy, Default)]
 #[cfg_attr(feature = "cli", derive(ValueEnum))]
 pub enum DitheringStrategy {
+    /// No dithering — raw brightness-to-character mapping.
     #[default]
     None,
+    /// Floyd–Steinberg error diffusion — fast, classic, good all-rounder.
     FloydSteinberg,
+    /// Atkinson dithering — preserves more contrast, good for sharp edges.
     Atkinson,
+    /// Riemersma dithering — follows a space-filling curve; can produce
+    /// more natural grain patterns.
     Riemersma,
 }
 
 impl DitheringStrategy {
+    /// Apply this dithering strategy to a flat grayscale buffer.
+    ///
+    /// * `grayscale` — slice of `f32` luminance values (0.0–255.0), mutated in place.
+    /// * `width` / `height` — dimensions of the image.
+    /// * `levels` — number of output levels (typically the character ramp length).
     pub fn apply(&self, grayscale: &mut [f32], width: usize, height: usize, levels: usize) {
         match self {
             DitheringStrategy::None => {}

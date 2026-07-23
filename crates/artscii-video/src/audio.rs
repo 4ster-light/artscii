@@ -5,6 +5,10 @@ use anyhow::{Context, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use ffmpeg_next as ffmpeg;
 
+/// Play the audio track of the given video file through the default audio device.
+///
+/// Uses `ffmpeg` to decode the audio stream and `cpal` for playback.
+/// Returns after the decoded audio has been consumed.
 pub fn play_audio(input: &std::path::Path) -> Result<()> {
     ffmpeg::init().context("failed to initialize ffmpeg")?;
 

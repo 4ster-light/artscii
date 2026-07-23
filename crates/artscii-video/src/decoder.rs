@@ -6,6 +6,12 @@ use image::{DynamicImage, RgbImage};
 
 use crate::{FrameConversion, VideoConfig, VideoConversion};
 
+/// Decode a video file using `ffmpeg` and convert every frame to ASCII.
+///
+/// Initialises the ffmpeg library, opens the input, finds the best video
+/// stream, decodes it frame-by-frame into RGB, and passes each frame through
+/// [`artscii_img::convert_image`]. Returns a [`VideoConversion`] with all
+/// the converted frames.
 pub fn decode_video(config: &VideoConfig) -> Result<VideoConversion> {
     config
         .validate()

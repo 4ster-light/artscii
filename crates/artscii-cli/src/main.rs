@@ -1,3 +1,5 @@
+//! Command-line interface for ArtSCII — converts images and videos to ASCII art.
+
 mod cli;
 mod output;
 

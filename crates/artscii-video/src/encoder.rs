@@ -11,6 +11,10 @@ use image::{ImageBuffer, Rgb, RgbImage};
 
 use crate::{VideoConversion, VideoOutputMode};
 
+/// Render a [`VideoConversion`] to the chosen output format.
+///
+/// Dispatches to `write_terminal`, `write_gif`, or `write_mp4`
+/// depending on the conversion's [`VideoOutputMode`].
 pub fn encode_video(conversion: &VideoConversion, output: Option<&Path>) -> Result<()> {
     match conversion.output_mode {
         VideoOutputMode::Terminal => write_terminal(conversion),

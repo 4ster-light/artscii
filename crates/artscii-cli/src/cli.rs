@@ -5,19 +5,31 @@ use artscii_img::DitheringStrategy;
 #[cfg(feature = "video")]
 use artscii_video::{VideoConfig, VideoOutputMode};
 
+/// Output format for image-to-ASCII conversion.
+///
+/// When not specified explicitly, the format is inferred from the output
+/// file extension (`.html` → Html, `.txt` → Text) or defaults to
+/// [`OutputFormat::Terminal`].
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum OutputFormat {
+    /// Print to stdout with optional ANSI colours.
     #[default]
     Terminal,
+    /// Plain UTF-8 text (with ANSI escapes if `--color` is set).
     Text,
+    /// Self-contained styled HTML document.
     Html,
 }
 
+/// Video output mode — determines how the converted frames are rendered.
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum VideoFormat {
+    /// Play back in the terminal (frame-by-frame with ASCII).
     #[default]
     Terminal,
+    /// Export as an animated GIF.
     Gif,
+    /// Export as an MP4 video file.
     Mp4,
 }
 
@@ -78,6 +90,9 @@ pub struct Cli {
 }
 
 impl Cli {
+    /// Determine the output format, respecting explicit `--format` first,
+    /// then falling back to the output file extension, then to
+    /// [`OutputFormat::Terminal`].
     pub fn determine_format(&self) -> OutputFormat {
         if let Some(format) = self.format {
             return format;
@@ -96,6 +111,7 @@ impl Cli {
         OutputFormat::Terminal
     }
 
+    /// Build a [`VideoConfig`] from the CLI arguments.
     #[cfg(feature = "video")]
     pub fn to_video_config(&self) -> VideoConfig {
         let mut config = VideoConfig::new(&self.input);
@@ -115,6 +131,7 @@ impl Cli {
         config
     }
 
+    /// Build a [`artscii_img::ConvertConfig`] from the CLI arguments.
     pub fn to_convert_config(&self) -> artscii_img::ConvertConfig {
         artscii_img::ConvertConfig {
             resolution: self.resolution,

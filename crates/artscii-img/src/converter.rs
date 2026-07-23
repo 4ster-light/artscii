@@ -7,16 +7,33 @@ use crate::error::{ArtsciiImgError, Result};
 const ASCII_CHARS: &str = " .,:;i1tfLCG08@";
 const ASCII_CHARS_INVERTED: &str = "@80GCLft1i;:,. ";
 
+/// The result of an ASCII conversion — a grid of characters, optional
+/// per-cell colour, and ready-made formatters.
+///
+/// # Output formats
+///
+/// * [`to_plain_text`](Self::to_plain_text) — newline-delimited UTF-8, always available.
+/// * [`to_ansi`](Self::to_ansi) — terminal-coloured output (requires the `cli` feature).
+/// * [`to_html`](Self::to_html) — self-contained styled HTML document.
 #[derive(Debug, Clone, PartialEq)]
 pub struct AsciiResult {
+    /// Width of the character grid.
     pub width: usize,
+    /// Height of the character grid.
     pub height: usize,
+    /// Row-major character buffer (`chars[y * width + x]`).
     pub chars: Vec<char>,
+    /// Row-major per-pixel colour buffer, even when `colored` is `false`.
     pub colors: Vec<Rgb<u8>>,
+    /// Whether the conversion was configured with `colored = true`.
     pub colored: bool,
 }
 
 impl AsciiResult {
+    /// Render the ASCII grid as plain UTF-8 text with newlines.
+    ///
+    /// Ignores colour information — use [`to_ansi`](Self::to_ansi) or
+    /// [`to_html`](Self::to_html) for colour output.
     pub fn to_plain_text(&self) -> String {
         let mut result = String::with_capacity(self.width * self.height + self.height);
 
@@ -30,6 +47,10 @@ impl AsciiResult {
         result
     }
 
+    /// Render as ANSI-coloured terminal text.
+    ///
+    /// Requires the `cli` feature (depends on `colored`). If the conversion
+    /// was not configured with `colored = true`, this falls back to plain text.
     #[cfg(feature = "cli")]
     pub fn to_ansi(&self) -> String {
         use colored::Colorize;
@@ -54,6 +75,11 @@ impl AsciiResult {
         result
     }
 
+    /// Render as a self-contained HTML document.
+    ///
+    /// Produces a complete `<html>` page with dark-background styling. When
+    /// `colored` is `true`, each character is wrapped in a `<span>` with an
+    /// inline `color:rgb(…)` style.
     pub fn to_html(&self) -> String {
         let mut result = String::from(
             r#"<!DOCTYPE html>
@@ -137,6 +163,16 @@ fn adjust_pixel(value: f32, contrast: f32, brightness: f32) -> f32 {
     adjusted.clamp(0.0, 255.0)
 }
 
+/// Convert an image to an ASCII art grid.
+///
+/// Resizes the image according to `config.resolution`, optionally adjusts
+/// contrast and brightness, applies the chosen dithering, and maps each
+/// pixel to a character from the internal ramp (` .,:;i1tfLCG08@`).
+///
+/// # Errors
+///
+/// Returns [`ArtsciiImgError::Core`] if the config fails validation or the
+/// scaled dimensions become zero.
 pub fn convert_image(img: &DynamicImage, config: &ConvertConfig) -> Result<AsciiResult> {
     config.validate()?;
 
@@ -203,6 +239,10 @@ pub fn convert_image(img: &DynamicImage, config: &ConvertConfig) -> Result<Ascii
     })
 }
 
+/// Load an image from a file path.
+///
+/// This is a thin convenience wrapper around [`image::open`] that returns
+/// an [`ArtsciiImgError::ImageLoad`] on failure.
 pub fn load_image(path: &std::path::Path) -> Result<DynamicImage> {
     let img = image::open(path)?;
     Ok(img)
