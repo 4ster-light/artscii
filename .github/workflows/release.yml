@@ -30,7 +30,7 @@ jobs:
             asset_name: artscii-macos-aarch64
             bundle_libs: false
 
-          - os: macos-latest
+          - os: macos-15-intel
             target: x86_64-apple-darwin
             asset_name: artscii-macos-x86_64
             bundle_libs: false
@@ -158,6 +158,9 @@ jobs:
           files: |
             ./${{ matrix.asset_name }}
             ./${{ matrix.asset_name }}.sha256
+          # Tags with a pre-release suffix (for example v2.0.1-rc.1) must not
+          # be published as the latest release.
+          prerelease: ${{ contains(github.ref_name, '-') }}
 
   checksums:
     name: Aggregate checksums
@@ -180,3 +183,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: sums/SHA256SUMS
+          prerelease: ${{ contains(github.ref_name, '-') }}
