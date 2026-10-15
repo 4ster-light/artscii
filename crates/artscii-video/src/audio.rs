@@ -89,8 +89,8 @@ pub fn play_audio(input: &std::path::Path) -> Result<()> {
             if resampler.run(&decoded, &mut converted).is_ok() {
                 let data = converted.data(0);
                 let mut samples = Vec::with_capacity(data.len() / 4);
-                for chunk in data.chunks_exact(4) {
-                    samples.push(f32::from_ne_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]));
+                for chunk in data.as_chunks::<4>().0 {
+                    samples.push(f32::from_ne_bytes(*chunk));
                 }
                 if let Ok(mut q) = queue.lock() {
                     q.extend(samples);
