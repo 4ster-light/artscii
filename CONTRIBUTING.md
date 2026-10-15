@@ -10,8 +10,12 @@ nix develop
 
 ```bash
 nix flake check
-nix build
+nix build .#artscii
+nix build .#artscii-web
 ```
+
+`nix flake check` runs `cargo fmt --check`, `clippy -D warnings`, the workspace
+tests, and `cargo doc` through the flake's `checks` outputs.
 
 > [!NOTE]
 > `nix build` only sees files that are included in the flake source, so new
@@ -39,7 +43,8 @@ crates/artscii-video # video scaffolding
 
 - Keep changes focused.
 - Update docs when behavior or structure changes.
-- Prefer the Nix flake for local development and validation.
+- Prefer the Nix flake for local development and validation. The Rust toolchain
+  is pinned in `rust-toolchain.toml` and shared by `nix develop` and CI.
 - Mention any extra commands needed to verify your change.
 
 ## Need Help?

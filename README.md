@@ -3,6 +3,25 @@
 A workspace with a shared foundation crate, a reusable image-conversion crate, a
 CLI binary, and video scaffolding.
 
+## Table of Contents
+
+- [Features](#features)
+- [Workspace](#workspace)
+- [Using the crate](#using-the-crate)
+- [Installation](#installation)
+  - [cargo-binstall](#cargo-binstall)
+  - [Install script](#install-script)
+  - [Prebuilt binaries](#prebuilt-binaries)
+  - [Nix](#nix)
+  - [Cargo](#cargo)
+- [Usage](#usage)
+  - [Options](#options)
+  - [Example Commands](#example-commands)
+  - [Dithering Algorithms](#dithering-algorithms)
+- [Building from Source](#building-from-source)
+  - [Dependencies](#dependencies)
+- [License](#license)
+
 ## Features
 
 - **Multiple dithering algorithms**: Floyd-Steinberg, Atkinson, and Riemersma
@@ -58,18 +77,60 @@ The CLI crate builds the `artscii` binary.
 
 ## Installation
 
-### Prebuilt Binaries
+### cargo-binstall
 
-Download prebuilt binaries for your platform from the
+[cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installs a
+prebuilt binary from GitHub Releases. The crate is not published to crates.io,
+so point binstall at the repository:
+
+```bash
+# Install cargo-binstall once (see its README for a prebuilt installer)
+cargo install cargo-binstall
+
+# Install ArtSCII
+cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
+```
+
+> [!WARNING]
+> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** the
+> release is a self-contained bundle (binary plus ffmpeg/alsa libraries) that
+> binstall cannot unpack into place, so it falls back to building from source;
+> use the [install script](#install-script) if you want the bundled binary.
+
+### Install script
+
+Linux and macOS, no Rust toolchain required:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/4ster-light/artscii/main/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
+```
+
+The script installs into `~/.local/bin`
+(`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
+`ARtscii_INSTALL_DIR` (or `$env:ARtscii_INSTALL_DIR`), and select a specific
+release with `ARtscii_VERSION` (for example `v2.0.0`).
+
+### Prebuilt binaries
+
+Download the asset for your platform from the
 [latest release](https://github.com/4ster-light/artscii/releases/latest):
 
-- **Linux x86_64**: `artscii-linux-x86_64`
-- **Linux ARM64**: `artscii-linux-aarch64`
-- **macOS x86_64**: `artscii-macos-x86_64`
-- **macOS ARM64**: `artscii-macos-aarch64`
-- **Windows x86_64**: `artscii-windows-x86_64.exe`
+| Platform       | Asset                          |
+| -------------- | ------------------------------ |
+| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  |
+| Linux ARM64    | `artscii-linux-aarch64.tar.gz` |
+| macOS x86_64   | `artscii-macos-x86_64`         |
+| macOS ARM64    | `artscii-macos-aarch64`        |
+| Windows x86_64 | `artscii-windows-x86_64.exe`   |
 
-After downloading, extract and run (on Linux / Unix):
+Each asset ships with a matching `.sha256` checksum, plus an aggregated
+`SHA256SUMS` file. After downloading:
 
 ```bash
 # Linux (tar.gz with bundled libraries)
@@ -85,7 +146,13 @@ chmod +x artscii-macos-x86_64
 > Linux tarballs bundle required ffmpeg/alsa libraries — no extra packages
 > needed at runtime. macOS and Windows include video support natively.
 
-### Using Nix
+### Nix
+
+Run without installing:
+
+```bash
+nix run github:4ster-light/artscii -- image.jpg
+```
 
 Install into your profile:
 
@@ -93,14 +160,71 @@ Install into your profile:
 nix profile add github:4ster-light/artscii
 ```
 
-Or add to your system configuration if using NixOS.
+The flake also exposes `overlays.default`, `nixosModules.default`, and
+`homeManagerModules.default` for declarative installs.
+
+**NixOS:**
+
+```nix
+{
+  inputs.artscii.url = "github:4ster-light/artscii";
+
+  outputs =
+    { nixpkgs, artscii, ... }:
+    {
+      nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+        modules = [
+          artscii.nixosModules.default
+          { programs.artscii.enable = true; }
+        ];
+      };
+    };
+}
+```
+
+**home-manager:**
+
+```nix
+{
+  inputs.artscii.url = "github:4ster-light/artscii";
+
+  outputs =
+    { home-manager, artscii, ... }:
+    {
+      homeConfigurations."user@host" = home-manager.lib.homeManagerConfiguration {
+        modules = [
+          artscii.homeManagerModules.default
+          { programs.artscii.enable = true; }
+        ];
+      };
+    };
+}
+```
+
+Without the modules you can add the package (or the overlay) directly:
+
+```nix
+home.packages = [ inputs.artscii.packages.${pkgs.system}.artscii ];
+
+# ...or use the overlay:
+# nixpkgs.overlays = [ inputs.artscii.overlays.default ];
+# home.packages = [ pkgs.artscii ];
+```
 
 ### Cargo
 
-Build and install the CLI from source:
+Install the CLI from source (the crate builds the `artscii` binary):
 
 ```bash
-cargo install --git https://github.com/4ster-light/artscii artscii-cli
+cargo install --locked --git https://github.com/4ster-light/artscii artscii-cli
+```
+
+The `video` feature is enabled by default. Pass `--no-default-features` to skip
+`ffmpeg`/audio when you only need image conversion:
+
+```bash
+cargo install --locked --no-default-features \
+  --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
 ## Usage
@@ -193,10 +317,26 @@ Building from source requires system libraries for video and audio support.
 | macOS    | `brew install ffmpeg`                                                                                     |
 
 ```bash
-# Using Nix (recommended)
-nix build
+# CLI binary at ./result/bin/artscii
+nix build .#artscii
 
-# Or install deps manually then:
+# Static WASM site at ./result
+nix build .#artscii-web
+
+# Dev shell with the pinned Rust toolchain, trunk, ...
+nix develop
+
+# fmt + clippy + tests + docs
+nix flake check
+```
+
+The Rust toolchain is pinned in `rust-toolchain.toml` and shared by the dev
+shell, the Nix builds, and CI. If you are already inside `nix develop`, the
+usual `cargo` commands work as-is.
+
+Without Nix, install the dependencies listed above, then:
+
+```bash
 cargo build --release
 ```
 

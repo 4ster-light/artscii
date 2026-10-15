@@ -12,8 +12,14 @@ directly from your terminal.
 ## Quick start
 
 ```bash
-# Install from source
-cargo install --git https://github.com/4ster-light/artscii artscii-cli --features video
+# Prebuilt binary via cargo-binstall (fetches a GitHub release)
+cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
+
+# Or run it with Nix
+nix run github:4ster-light/artscii -- --help
+
+# Or build and install from source
+cargo install --locked --git https://github.com/4ster-light/artscii artscii-cli
 
 # Convert an image
 artscii photo.jpg
@@ -41,7 +47,8 @@ Disable `video` if you only need image conversion and want to avoid compiling
 `ffmpeg-next`:
 
 ```bash
-cargo install --git https://github.com/4ster-light/artscii artscii-cli --no-default-features
+cargo install --locked --no-default-features \
+  --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
 ## License
