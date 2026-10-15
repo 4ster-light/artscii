@@ -5,15 +5,15 @@
 #   curl -fsSL https://raw.githubusercontent.com/4ster-light/artscii/main/install.sh | sh
 #
 # Environment variables:
-#   ARtscii_VERSION      Release tag to install, e.g. v2.0.0 (default: latest)
-#   ARtscii_INSTALL_DIR  Directory to install the binary into
+#   ARTSCII_VERSION      Release tag to install, e.g. v2.0.0 (default: latest)
+#   ARTSCII_INSTALL_DIR  Directory to install the binary into
 #                        (default: $HOME/.local/bin)
 set -eu
 
 REPO="4ster-light/artscii"
 BIN="artscii"
-VERSION="${ARtscii_VERSION:-latest}"
-INSTALL_DIR="${ARtscii_INSTALL_DIR:-$HOME/.local/bin}"
+VERSION="${ARTSCII_VERSION:-latest}"
+INSTALL_DIR="${ARTSCII_INSTALL_DIR:-$HOME/.local/bin}"
 
 os="$(uname -s)"
 arch="$(uname -m)"

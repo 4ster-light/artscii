@@ -113,8 +113,8 @@ irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
 
 The script installs into `~/.local/bin`
 (`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
-`ARtscii_INSTALL_DIR` (or `$env:ARtscii_INSTALL_DIR`), and select a specific
-release with `ARtscii_VERSION` (for example `v2.0.0`).
+`ARTSCII_INSTALL_DIR` (or `$env:ARTSCII_INSTALL_DIR`), and select a specific
+release with `ARTSCII_VERSION` (for example `v2.0.0`).
 
 ### Prebuilt binaries
 

@@ -4,17 +4,17 @@
 #   irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
 #
 # Environment variables:
-#   $env:ARtscii_VERSION      Release tag to install, e.g. v2.0.0 (default: latest)
-#   $env:ARtscii_INSTALL_DIR  Directory to install into
+#   $env:ARTSCII_VERSION      Release tag to install, e.g. v2.0.0 (default: latest)
+#   $env:ARTSCII_INSTALL_DIR  Directory to install into
 #                             (default: $env:LOCALAPPDATA\Programs\artscii)
 $ErrorActionPreference = "Stop"
 
 $Repo = "4ster-light/artscii"
 $Bin = "artscii"
 $Asset = "artscii-windows-x86_64.exe"
-$Version = $env:ARtscii_VERSION
-$InstallDir = if ($env:ARtscii_INSTALL_DIR) {
-    $env:ARtscii_INSTALL_DIR
+$Version = $env:ARTSCII_VERSION
+$InstallDir = if ($env:ARTSCII_INSTALL_DIR) {
+    $env:ARTSCII_INSTALL_DIR
 } else {
     Join-Path $env:LOCALAPPDATA "Programs\artscii"
 }
