@@ -23,3 +23,26 @@ video = ["dep:artscii-video"]
 [[bin]]
 name = "artscii"
 path = "src/main.rs"
+
+# Prebuilt binaries are published to GitHub Releases with non-standard names.
+# These overrides let `cargo binstall` fetch them on macOS and Windows. On
+# Linux the release is a self-contained bundle (binary + ffmpeg/alsa libs),
+# which binstall cannot unpack into place, so it falls back to building from
+# source there; use install.sh for a bundled Linux binary.
+[package.metadata.binstall]
+disabled-strategies = ["quick-install"]
+
+[package.metadata.binstall.overrides.aarch64-apple-darwin]
+pkg-url = "{ repo }/releases/download/v{ version }/artscii-macos-aarch64"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "bin"
+
+[package.metadata.binstall.overrides.x86_64-apple-darwin]
+pkg-url = "{ repo }/releases/download/v{ version }/artscii-macos-x86_64"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "bin"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-url = "{ repo }/releases/download/v{ version }/artscii-windows-x86_64.exe"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "bin"
