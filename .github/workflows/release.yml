@@ -143,7 +143,40 @@ jobs:
           cp "target/${{ matrix.target }}/release/artscii${EXT}" "${{ matrix.asset_name }}"
         shell: bash
 
+      - name: Generate checksum
+        shell: bash
+        run: |
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${{ matrix.asset_name }}" > "${{ matrix.asset_name }}.sha256"
+          else
+            shasum -a 256 "${{ matrix.asset_name }}" > "${{ matrix.asset_name }}.sha256"
+          fi
+
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: ./${{ matrix.asset_name }}
+          files: |
+            ./${{ matrix.asset_name }}
+            ./${{ matrix.asset_name }}.sha256
+
+  checksums:
+    name: Aggregate checksums
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download per-asset checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p sums
+          cd sums
+          gh release download "${{ github.ref_name }}" --pattern '*.sha256'
+          cat ./*.sha256 > SHA256SUMS
+
+      - name: Upload SHA256SUMS
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sums/SHA256SUMS
