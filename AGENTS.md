@@ -90,6 +90,34 @@ dependency cache and from the clippy/test/doc checks. There are no WASM tests.
 The flake is built with [crane](https://github.com/ipetkov/crane) on a pinned
 `nixos-26.05` and [rust-overlay](https://github.com/oxalica/rust-overlay).
 
+## Flake Layout
+
+The flake is assembled with [flake-parts](https://flake.parts/), so every
+output lives in a small, single-purpose flake module under `nix/`. The build
+side:
+
+| Path                   | Contributes                                          |
+| ---------------------- | ---------------------------------------------------- |
+| `nix/packages.nix`     | `packages.*` and `apps.*`                            |
+| `nix/checks.nix`       | `checks.{fmt,clippy,test,doc}`                       |
+| `nix/devshell.nix`     | `devShells.default`                                  |
+| `nix/formatter.nix`    | `formatter`                                          |
+| `nix/crane.nix`        | Shared Crane build context used by the outputs above |
+| `nix/wasm-bindgen.nix` | `wasm-bindgen-cli` pinned to the `Cargo.lock` crate  |
+
+The downstream integration surfaces are grouped in `nix/modules/` (each file
+is still a flake-parts module; `overlay.nix` is a Nixpkgs overlay rather than
+a NixOS module):
+
+| Path                           | Contributes                          |
+| ------------------------------ | ------------------------------------ |
+| `nix/modules/nixos.nix`        | `nixosModules.default`               |
+| `nix/modules/home-manager.nix` | `homeManagerModules.default`         |
+| `nix/modules/overlay.nix`      | `overlays.default` (Nixpkgs overlay) |
+
+`flake.nix` only wires the inputs, the supported `systems`, the
+rust-overlay-applied `pkgs`, and the modules above.
+
 ## Gotchas
 
 - `nix build` only sees **git-tracked** files. New files must be committed (or

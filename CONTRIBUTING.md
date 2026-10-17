@@ -9,10 +9,15 @@ nix develop
 ## Verify Changes
 
 ```bash
-nix flake check
-nix build .#artscii
-nix build .#artscii-web
+nix flake check          # fmt + clippy + tests + docs
+nix build .#artscii      # CLI at ./result/bin/artscii
+nix build .#artscii-web  # static site at ./result
 ```
+
+`nix build`, `nix build .#default` and `nix build .#artscii` all build the CLI;
+only `.#artscii-web` builds the site. Each invocation replaces the `./result`
+symlink, so don't `cd` into it if you intend to rebuild (the shell keeps the
+old store path).
 
 `nix flake check` runs `cargo fmt --check`, `clippy -D warnings`, the workspace
 tests, and `cargo doc` through the flake's `checks` outputs.
@@ -21,14 +26,23 @@ tests, and `cargo doc` through the flake's `checks` outputs.
 > `nix build` only sees files that are included in the flake source, so new
 > workspace files must be tracked before it can see them.
 
-If you are already in the dev shell, these are also useful:
+The following are also useful for targeted checks:
 
 ```bash
-cargo check --workspace
-cargo test --workspace
-cargo fmt --all --check
-cargo clippy --all-targets --workspace -- -D warnings
+nix develop -c cargo check --workspace
+nix develop -c cargo test --workspace
+nix develop -c cargo fmt --all --check
+nix develop -c cargo clippy --all-targets --workspace -- -D warnings
 ```
+
+## Flake Structure
+
+The flake is a thin [flake-parts](https://flake.parts/) bootstrap; the logic
+lives in focused modules under `nix/`:
+
+- `nix/{packages,checks,devshell,formatter}.nix` — per-system outputs
+- `nix/crane.nix`, `nix/wasm-bindgen.nix` — shared build helpers
+- `nix/modules/{nixos,home-manager,overlay}.nix` — downstream integrations
 
 ## Workspace Layout
 
