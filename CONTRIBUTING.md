@@ -9,7 +9,8 @@ nix develop
 ## Verify Changes
 
 ```bash
-nix flake check          # fmt + clippy + tests + docs
+nix flake check          # fmt + clippy + tests + docs + web checks
+nix fmt -- --ci          # Nix file formatting (not part of flake check)
 nix build .#artscii      # CLI at ./result/bin/artscii
 nix build .#artscii-web  # static site at ./result
 ```
@@ -20,10 +21,13 @@ symlink, so don't `cd` into it if you intend to rebuild (the shell keeps the
 old store path).
 
 `nix flake check` runs `cargo fmt --check`, `clippy -D warnings`, the workspace
-tests, and `cargo doc` through the flake's `checks` outputs.
+tests, `cargo doc`, and clippy + the Trunk build for `artscii-web`, all through
+the flake's `checks` outputs. Nix file formatting is checked separately with
+`nix fmt -- --ci`. CI runs the exact same commands, so a green run locally means
+a green CI run.
 
 > [!NOTE]
-> `nix build` only sees files that are included in the flake source, so new
+> `nix <COMMAND>` only sees files that are included in the flake source, so new
 > workspace files must be tracked before it can see them.
 
 The following are also useful for targeted checks:

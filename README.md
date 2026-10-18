@@ -326,12 +326,17 @@ nix build .#artscii-web
 # Dev shell with the pinned Rust toolchain, trunk, ...
 nix develop
 
-# fmt + clippy + tests + docs
+# fmt + clippy + tests + docs + web checks
 nix flake check
+
+# Nix file formatting
+nix fmt -- --ci
 ```
 
 The Rust toolchain is pinned in `rust-toolchain.toml` and shared by the dev
-shell, the Nix builds, and CI. If you are already inside `nix develop`, the
+shell, the Nix builds, and CI. CI (`.github/workflows/ci.yml`) runs the same
+`nix flake check` plus `nix fmt -- --ci` on every pull request, so the checks
+above are exactly what has to pass. If you are already inside `nix develop`, the
 usual `cargo` commands work as-is.
 
 Without Nix, install the dependencies listed above, then:
