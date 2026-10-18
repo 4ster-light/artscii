@@ -15,20 +15,28 @@ nix build .#artscii      # CLI at ./result/bin/artscii
 nix build .#artscii-web  # static site at ./result
 ```
 
-`nix build`, `nix build .#default` and `nix build .#artscii` all build the CLI;
-only `.#artscii-web` builds the site. Each invocation replaces the `./result`
-symlink, so don't `cd` into it if you intend to rebuild (the shell keeps the
-old store path).
-
-`nix flake check` runs `cargo fmt --check`, `clippy -D warnings`, the workspace
-tests, `cargo doc`, and clippy + the Trunk build for `artscii-web`, all through
-the flake's `checks` outputs. Nix file formatting is checked separately with
-`nix fmt -- --ci`. CI runs the exact same commands, so a green run locally means
-a green CI run.
-
-> [!NOTE]
+> [!IMPORTANT]
 > `nix <COMMAND>` only sees files that are included in the flake source, so new
 > workspace files must be tracked before it can see them.
+
+---
+
+> [!NOTE]
+> `nix build`, `nix build .#default` and `nix build .#artscii` all build the CLI;
+> only `.#artscii-web` builds the site. Each invocation replaces the `./result`
+> symlink, so don't `cd` into it if you intend to rebuild (the shell keeps the
+> old store path).
+
+---
+
+> [!WARNING]
+> `nix flake check` runs `cargo fmt --check`, `clippy -D warnings`, the workspace
+> tests, `cargo doc`, and clippy + the Trunk build for `artscii-web`, all through
+> the flake's `checks` outputs. Nix file formatting is checked separately with
+> `nix fmt -- --ci`. CI runs the exact same commands, so a green run locally means
+> a green CI run. To apply the fmt changes locally just do `nix fmt`
+
+---
 
 The following are also useful for targeted checks:
 

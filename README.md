@@ -1,7 +1,16 @@
 # ✰ArtSCII✰
 
-A workspace with a shared foundation crate, a reusable image-conversion crate, a
-CLI binary, and video scaffolding.
+[![CI](https://github.com/4ster-light/artscii/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/4ster-light/artscii?sort=semver&label=release&color=brightgreen)](https://github.com/4ster-light/artscii/releases/latest)
+[![Rust 1.85+](https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![Nix Flake](https://img.shields.io/badge/Nix-flake-5277C3?logo=nixos&logoColor=white)](flake.nix)
+[![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-teal)](https://github.com/4ster-light/artscii/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-red.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?logo=githubsponsors)](https://github.com/sponsors/4ster-light)
+[![Other sponsorship options](https://img.shields.io/badge/Other%20Sponsorship%20options-%204ster.dev-blue)](https://4ster.dev/sponsor)
+
+A workspace with the shared foundation crate, a reusable image-conversion crate and
+a video conversion crate, a CLI binary, and a web app built on WASM.
 
 ## Table of Contents
 
