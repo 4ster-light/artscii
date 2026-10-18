@@ -170,6 +170,8 @@ in
     craneLib
     pinnedWasmBindgenCli
     version
+    webCargoArtifacts
     webPackage
+    webSource
     ;
 }
