@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Superseded runs on the same PR are pointless; pushes to main are kept so
+# every commit on the default branch gets a green/red result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  flake-check:
+    name: nix flake check
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            # Keep the crane build inputs around so the store cache is useful
+            # across runs instead of being collected as garbage.
+            keep-env-derivations = true
+            keep-outputs = true
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock', 'Cargo.lock', 'rust-toolchain.toml') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          gc-max-store-size-linux: 6G
+
+      # `nix flake check` does not cover Nix formatting, so run the flake's own
+      # formatter in check mode. This is deliberately not a flake check: a local
+      # `nix flake check` should not spawn a treefmt fan-out on a laptop.
+      - name: Check Nix formatting
+        run: nix fmt -- --ci
+
+      # One job, one command: `checks.{fmt,clippy,test,doc,web-clippy,web-build,artscii}`
+      # all run through the flake, so this is exactly what `nix flake check`
+      # does locally with the pinned toolchain and system dependencies.
+      # `--keep-going` reports every failing check in a single run instead of
+      # stopping at the first one.
+      - name: nix flake check
+        run: nix flake check --keep-going --no-update-lock-file --print-build-logs
