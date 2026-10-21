@@ -11,7 +11,9 @@
   system,
 }:
 let
-  cargoLock = builtins.fromTOML (builtins.readFile ../Cargo.lock);
+  root = ../.;
+
+  cargoLock = fromTOML (builtins.readFile (root + "/Cargo.lock"));
   version = (builtins.head (builtins.filter (p: p.name == "wasm-bindgen") cargoLock.package)).version;
 
   hashes = {

@@ -13,6 +13,27 @@
 
   outputs =
     inputs@{ flake-parts, ... }:
+    let
+      findModules =
+        dir:
+        let
+          entries = builtins.readDir dir;
+        in
+        builtins.concatLists (
+          map (
+            name:
+            let
+              path = dir + "/${name}";
+            in
+            if entries.${name} == "directory" then
+              findModules path
+            else if entries.${name} == "regular" && builtins.match ".*\\.nix$" name != null then
+              [ path ]
+            else
+              [ ]
+          ) (builtins.attrNames entries)
+        );
+    in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -21,18 +42,8 @@
         "aarch64-darwin"
       ];
 
-      imports = [
-        ./nix/packages.nix
-        ./nix/checks.nix
-        ./nix/devshell.nix
-        ./nix/formatter.nix
-        ./nix/modules/nixos.nix
-        ./nix/modules/home-manager.nix
-        ./nix/modules/overlay.nix
-      ];
+      imports = findModules ./nix/utils ++ findModules ./nix/modules;
 
-      # Every per-system output needs pkgs built with the pinned Rust toolchain
-      # overlay, so override flake-parts' default `pkgs`.
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;

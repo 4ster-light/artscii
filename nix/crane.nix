@@ -17,8 +17,8 @@ let
 
   # Package metadata is sourced from the Cargo manifests so the flake does not
   # have to be touched on a version bump.
-  cargoToml = builtins.fromTOML (builtins.readFile (root + "/crates/artscii-cli/Cargo.toml"));
-  webCargoToml = builtins.fromTOML (builtins.readFile (root + "/crates/artscii-web/Cargo.toml"));
+  cargoToml = fromTOML (builtins.readFile (root + "/crates/artscii-cli/Cargo.toml"));
+  webCargoToml = fromTOML (builtins.readFile (root + "/crates/artscii-web/Cargo.toml"));
   cliPackage = cargoToml.package;
   webPackage = webCargoToml.package;
 

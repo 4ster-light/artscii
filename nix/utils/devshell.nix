@@ -9,7 +9,7 @@
       ...
     }:
     let
-      crane = import ./crane.nix {
+      crane = import ../crane.nix {
         inherit
           inputs
           pkgs
