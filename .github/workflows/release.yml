@@ -17,31 +17,42 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            asset_name: artscii-linux-x86_64.tar.gz
-            bundle_libs: true
+            asset: artscii-linux-x86_64
 
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            asset_name: artscii-linux-aarch64.tar.gz
-            bundle_libs: true
+            asset: artscii-linux-aarch64
 
           - os: macos-latest
             target: aarch64-apple-darwin
-            asset_name: artscii-macos-aarch64
-            bundle_libs: false
+            asset: artscii-macos-aarch64
 
           - os: macos-15-intel
             target: x86_64-apple-darwin
-            asset_name: artscii-macos-x86_64
-            bundle_libs: false
+            asset: artscii-macos-x86_64
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            asset_name: artscii-windows-x86_64.exe
-            bundle_libs: false
+            asset: artscii-windows-x86_64
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Resolve asset names
+        shell: bash
+        run: |
+          ext=""
+          [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
+          echo "PLAIN_ASSET=${{ matrix.asset }}${ext}" >> "$GITHUB_ENV"
+
+          # Linux publishes two assets per architecture: a standalone binary
+          # (`artscii-linux-*`, dynamically linked against the distro's
+          # ffmpeg/alsa, used by cargo-binstall) and a self-contained bundle
+          # (`artscii-linux-*.tar.gz`, libraries plus `$ORIGIN` rpath, used by
+          # install.sh).
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            echo "BUNDLE_ASSET=${{ matrix.asset }}.tar.gz" >> "$GITHUB_ENV"
+          fi
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -101,15 +112,22 @@ jobs:
           "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
 
       - name: Build
-        run: cargo build --release -p artscii-cli --features video --target ${{ matrix.target }}
+        run: cargo build --release --locked -p artscii-cli --features video --target ${{ matrix.target }}
         shell: bash
 
       - name: Strip binary (Unix)
         if: runner.os != 'Windows'
         run: strip target/${{ matrix.target }}/release/artscii
 
+      - name: Stage standalone binary
+        shell: bash
+        run: |
+          ext=""
+          [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
+          cp "target/${{ matrix.target }}/release/artscii${ext}" "$PLAIN_ASSET"
+
       - name: Bundle runtime libraries (Linux)
-        if: matrix.bundle_libs
+        if: runner.os == 'Linux'
         run: |
           set -e
           exe="target/${{ matrix.target }}/release/artscii"
@@ -133,31 +151,28 @@ jobs:
           for so in dist/*.so*; do
             patchelf --set-rpath '$ORIGIN' "$so" 2>/dev/null || true
           done
-          tar czf "${{ matrix.asset_name }}" -C dist .
+          tar czf "$BUNDLE_ASSET" -C dist .
 
-      - name: Prepare assets
-        if: matrix.bundle_libs == false
-        run: |
-          EXT=""
-          [ "${{ runner.os }}" = "Windows" ] && EXT=".exe"
-          cp "target/${{ matrix.target }}/release/artscii${EXT}" "${{ matrix.asset_name }}"
-        shell: bash
-
-      - name: Generate checksum
+      - name: Generate checksums
         shell: bash
         run: |
-          if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum "${{ matrix.asset_name }}" > "${{ matrix.asset_name }}.sha256"
-          else
-            shasum -a 256 "${{ matrix.asset_name }}" > "${{ matrix.asset_name }}.sha256"
-          fi
+          for asset in "$PLAIN_ASSET" ${BUNDLE_ASSET:+"$BUNDLE_ASSET"}; do
+            [ -f "$asset" ] || continue
+            if command -v sha256sum >/dev/null 2>&1; then
+              sha256sum "$asset" > "$asset.sha256"
+            else
+              shasum -a 256 "$asset" > "$asset.sha256"
+            fi
+          done
 
-      - name: Upload Release Asset
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
+          # Plain binary (and its checksum), plus the Linux bundle when there
+          # is one. Anything else in the workspace root does not start with
+          # `artscii-`.
           files: |
-            ./${{ matrix.asset_name }}
-            ./${{ matrix.asset_name }}.sha256
+            ./artscii-*
           # Tags with a pre-release suffix (for example v2.0.1-rc.1) must not
           # be published as the latest release.
           prerelease: ${{ contains(github.ref_name, '-') }}
