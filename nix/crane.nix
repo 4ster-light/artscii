@@ -7,7 +7,7 @@
   inputs,
   pkgs,
   lib,
-  system,
+  ...
 }:
 let
   root = ../.;
@@ -28,18 +28,10 @@ let
   version = cliPackage.version;
   repository = cliPackage.repository;
 
-  # Map the SPDX license identifier from the manifests to a nixpkgs license.
-  licenseFromSpdx =
-    spdx:
-    {
-      "MIT" = lib.licenses.mit;
-    }
-    .${spdx} or spdx;
-
   cliMeta = {
     description = cliPackage.description;
     homepage = repository;
-    license = licenseFromSpdx cliPackage.license;
+    license = lib.licenses.mit;
     mainProgram = binName;
     platforms = lib.platforms.unix;
   };
@@ -47,11 +39,9 @@ let
   webMeta = {
     description = webPackage.description;
     homepage = webPackage.repository;
-    license = licenseFromSpdx webPackage.license;
+    license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-
-  pinnedWasmBindgenCli = import ./wasm-bindgen.nix { inherit pkgs lib system; };
 
   # Only the files cargo cares about, plus the assets the web build needs.
   # Avoids rebuilding the world when a README changes.
@@ -90,10 +80,10 @@ let
       libclang
     ];
     # ALSA is Linux-only; on macOS cpal uses the system CoreAudio.
-    buildInputs = [ pkgs.ffmpeg ] ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.alsa-lib ];
+    buildInputs = [ pkgs.ffmpeg ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.alsa-lib ];
     LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
   }
-  // lib.optionalAttrs pkgs.stdenv.isLinux {
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
     BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.stdenv.cc.libc_dev}/include";
   };
 
@@ -140,7 +130,7 @@ let
       src = webSource;
       cargoArtifacts = webCargoArtifacts;
       CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
-      wasm-bindgen-cli = pinnedWasmBindgenCli;
+      wasm-bindgen-cli = pkgs.wasm-bindgen-cli_0_2_126;
 
       # The workspace root is a virtual manifest with no root package, so
       # Trunk has to be invoked from inside the web crate.
@@ -168,7 +158,6 @@ in
     cliPackage
     commonArgs
     craneLib
-    pinnedWasmBindgenCli
     version
     webCargoArtifacts
     webPackage
