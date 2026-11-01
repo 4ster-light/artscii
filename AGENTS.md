@@ -45,7 +45,31 @@ cores, which is unpleasant on a laptop).
 | `artscii-cli`   | bin  | CLI binary named `artscii` (not `artscii-cli`)        |
 | `artscii-web`   | WASM | Leptos CSR SPA built with Trunk                       |
 
-Rust edition is **2024** across all crates.
+Rust edition is **2024** across all crates. Version, edition, `rust-version`,
+authors, license, and repository are single-sourced from `[workspace.package]`
+in the root `Cargo.toml`; crates inherit them with `version.workspace = true`
+and friends, so a release bump only edits the root manifest. `rust-version` is
+**1.88** (the `artscii-video` code uses `Option::as_chunks`, and Leptos needs
+the same). `nix/crane.nix` reads those fields straight from the
+`[workspace.package]` table with `lib.importTOML`, so the flake never needs a
+version bump either.
+
+## Packaging
+
+| Path                                   | What it is                                  |
+| -------------------------------------- | ------------------------------------------- |
+| `Makefile` (`srpm` target)             | Entry point COPR uses for SCM builds        |
+| `packaging/fedora/artscii.spec`        | Fedora/COPR spec (COPR project `4ster-light/artscii`) |
+| `packaging/fedora/Makefile`            | Fetches `Source0`, builds the SRPM          |
+
+The spec builds from source with `--locked` (no vendoring, no bundling), so the
+COPR project must keep **"enable internet access during builds"** on: the
+crates.io fetch happens during the build. Rebuild the SRPM locally with
+`make -C packaging/fedora srpm`, then `copr-cli build 4ster-light/artscii <srpm>`
+or `rpmbuild --rebuild` it in a `fedora:44`/`fedora:45` container. The COPR
+project is `4ster-light/artscii` (fedora-44/45/rawhide, x86_64 and aarch64).
+Those releases, plus Arch, build and run against their stock ffmpeg (MP4 export
+works via `libopenh264` on Fedora and `libx264` on Arch).
 
 ## Feature Flags
 
@@ -61,8 +85,10 @@ Rust edition is **2024** across all crates.
 ## Web Crate (artscii-web)
 
 Built with Leptos (CSR mode) and Trunk. The dev shell already includes the
-`wasm32-unknown-unknown` target, Trunk, wrangler, and a `wasm-bindgen-cli` pinned to
-the version in `Cargo.lock`, so no `rustup target add` is needed.
+`wasm32-unknown-unknown` target, Trunk, wrangler, and `wasm-bindgen-cli` from
+nixpkgs' versioned `wasm-bindgen-cli_0_2_126` attribute (matching the
+`wasm-bindgen` version pinned in the web manifest), so no `rustup target add`
+is needed.
 
 Dev server:
 
@@ -124,7 +150,13 @@ Why one job instead of one job per check:
 
 `.github/workflows/release.yml` is separate and only runs on `v*` tags; it builds
 the CLI natively on Linux/macOS/Windows with `cargo` (not Nix) to produce the
-release archives.
+release archives. Linux publishes two assets per architecture: a standalone
+binary (`artscii-linux-*`) and `artscii-linux-*.tar.gz`, a self-contained bundle
+with the libraries and an `$ORIGIN` rpath that `install.sh` consumes. The
+standalone binary is built on Ubuntu 24.04, so it is hard-linked to that
+distro's ffmpeg 6 sonames and is *not* wired into `cargo binstall` on Linux;
+the bundle is the portable artifact. The `[workspace.package]` version and the
+pushed tag must match, and nothing in CI enforces that yet.
 
 ## Flake Layout
 
@@ -132,14 +164,13 @@ The flake is assembled with [flake-parts](https://flake.parts/), so every
 output lives in a small, single-purpose flake module under `nix/`. The build
 side:
 
-| Path                   | Contributes                                          |
-| ---------------------- | ---------------------------------------------------- |
-| `nix/packages.nix`     | `packages.*` and `apps.*`                            |
-| `nix/checks.nix`       | `checks.*` (quality gates)                           |
-| `nix/devshell.nix`     | `devShells.default`                                  |
-| `nix/formatter.nix`    | `formatter`                                          |
-| `nix/crane.nix`        | Shared Crane build context used by the outputs above |
-| `nix/wasm-bindgen.nix` | `wasm-bindgen-cli` pinned to the `Cargo.lock` crate  |
+| Path                        | Contributes                                          |
+| --------------------------- | ---------------------------------------------------- |
+| `nix/utils/packages.nix`    | `packages.*` and `apps.*`                            |
+| `nix/utils/checks.nix`      | `checks.*` (quality gates)                           |
+| `nix/utils/devshell.nix`    | `devShells.default`                                  |
+| `nix/utils/formatter.nix`   | `formatter`                                          |
+| `nix/crane.nix`             | Shared Crane build context used by the outputs above |
 
 The downstream integration surfaces are grouped in `nix/modules/` (each file
 is still a flake-parts module; `overlay.nix` is a Nixpkgs overlay rather than

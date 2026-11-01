@@ -52,8 +52,8 @@ nix develop -c cargo clippy --all-targets --workspace -- -D warnings
 The flake is a thin [flake-parts](https://flake.parts/) bootstrap; the logic
 lives in focused modules under `nix/`:
 
-- `nix/{packages,checks,devshell,formatter}.nix` — per-system outputs
-- `nix/crane.nix`, `nix/wasm-bindgen.nix` — shared build helpers
+- `nix/utils/{packages,checks,devshell,formatter}.nix` — per-system outputs
+- `nix/crane.nix` — shared Crane build context
 - `nix/modules/{nixos,home-manager,overlay}.nix` — downstream integrations
 
 ## Workspace Layout
@@ -61,8 +61,10 @@ lives in focused modules under `nix/`:
 ```txt
 crates/artscii-core  # shared config, errors, and dithering strategy
 crates/artscii-img   # image loading and ASCII conversion
-crates/artscii-cli   # binary CLI
-crates/artscii-video # video scaffolding
+crates/artscii-video # video decoding and ASCII encoding
+crates/artscii-cli   # binary CLI (installs `artscii`)
+crates/artscii-web   # Leptos/WASM web app
+packaging/fedora     # COPR spec + SRPM helpers
 ```
 
 ## What To Keep In Mind
@@ -71,6 +73,9 @@ crates/artscii-video # video scaffolding
 - Update docs when behavior or structure changes.
 - Prefer the Nix flake for local development and validation. The Rust toolchain
   is pinned in `rust-toolchain.toml` and shared by `nix develop` and CI.
+- The `[workspace.package]` version is the single source of truth; the release
+  tag must match it (`packaging/fedora/artscii.spec` still carries its own
+  `Version:`, bump both).
 - Mention any extra commands needed to verify your change.
 
 ## Need Help?

@@ -1,14 +1,18 @@
-# [✰ArtSCII✰](https://artscii.pages.dev)
+# ✰ArtSCII✰
 
-[![CI](https://github.com/4ster-light/artscii/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/4ster-light/artscii?sort=semver&label=release&color=2f6f4e&style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
-[![Rust 1.85+](https://img.shields.io/badge/rust-1.85%2B-dea584?logo=rust&logoColor=white&style=flat-square)](https://www.rust-lang.org)
-[![Nix flake](https://img.shields.io/badge/Nix-flake-5277C3?logo=nixos&logoColor=white&style=flat-square)](flake.nix)
-[![WebAssembly](https://img.shields.io/badge/WebAssembly-Wasm-654FF0?logo=webassembly&logoColor=white&style=flat-square)](crates/artscii-web)
 [![Website](https://img.shields.io/badge/website-artscii.pages.dev-1f7a5a?logo=cloudflare&logoColor=white&style=flat-square)](https://artscii.pages.dev)
 [![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-teal?style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-red?style=flat-square)](LICENSE)
+[![Nix flake](https://img.shields.io/badge/Nix-flake-5277C3?logo=nixos&logoColor=white&style=flat-square)](flake.nix)
+[![COPR](https://img.shields.io/badge/Fedora-COPR-3c6eb4?logo=fedora&logoColor=white&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii)
+
+[![CI](https://img.shields.io/github/actions/workflow/status/4ster-light/artscii/ci.yml?branch=main&event=push&style=flat-square)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
+[![COPR](https://img.shields.io/copr/build/4ster-light/artscii/artscii?label=COPR&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii/builds/)
+[![Rust 1.88+](https://img.shields.io/badge/rust-1.88%2B-dea584?logo=rust&logoColor=white&style=flat-square)](https://www.rust-lang.org)
+[![WebAssembly](https://img.shields.io/badge/WebAssembly-Wasm-654FF0?logo=webassembly&logoColor=white&style=flat-square)](crates/artscii-web)
+
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?logo=githubsponsors&logoColor=white&style=flat-square)](https://github.com/sponsors/4ster-light)
+[![License: MIT](https://img.shields.io/badge/license-MIT-red?style=flat-square)](LICENSE)
 
 A workspace with the shared foundation crate, a reusable image-conversion crate and
 a video conversion crate, a CLI binary, and a web app built on WASM.
@@ -19,6 +23,7 @@ a video conversion crate, a CLI binary, and a web app built on WASM.
 - [Workspace](#workspace)
 - [Using the crate](#using-the-crate)
 - [Installation](#installation)
+  - [Fedora (COPR)](#fedora-copr)
   - [cargo-binstall](#cargo-binstall)
   - [Install script](#install-script)
   - [Prebuilt binaries](#prebuilt-binaries)
@@ -87,6 +92,20 @@ The CLI crate builds the `artscii` binary.
 
 ## Installation
 
+### Fedora (COPR)
+
+Fedora 44, 45 and rawhide, x86_64 and aarch64:
+
+```bash
+sudo dnf copr enable 4ster-light/artscii
+sudo dnf install artscii
+```
+
+The package links the distribution's ffmpeg and ALSA libraries, so codec
+support follows the ffmpeg package you have installed, and `dnf remove artscii`
+cleans up after it. Source is in `packaging/fedora/` if you prefer to build the
+RPM yourself.
+
 ### cargo-binstall
 
 [cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installs a
@@ -102,10 +121,11 @@ cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
 > [!WARNING]
-> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** the
-> release is a self-contained bundle (binary plus ffmpeg/alsa libraries) that
-> binstall cannot unpack into place, so it falls back to building from source;
-> use the [install script](#install-script) if you want the bundled binary.
+> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** it
+> falls back to compiling from source (needs a Rust toolchain plus ffmpeg, ALSA
+> and clang), because the prebuilt Linux binary is only usable on ffmpeg 6
+> systems — see [Prebuilt binaries](#prebuilt-binaries). Use the
+> [install script](#install-script) if you want the self-contained bundle.
 
 ### Install script
 
@@ -131,19 +151,21 @@ release with `ARTSCII_VERSION` (for example `v2.0.0`).
 Download the asset for your platform from the
 [latest release](https://github.com/4ster-light/artscii/releases/latest):
 
-| Platform       | Asset                          |
-| -------------- | ------------------------------ |
-| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  |
-| Linux ARM64    | `artscii-linux-aarch64.tar.gz` |
-| macOS x86_64   | `artscii-macos-x86_64`         |
-| macOS ARM64    | `artscii-macos-aarch64`        |
-| Windows x86_64 | `artscii-windows-x86_64.exe`   |
+| Platform       | Asset                          | Notes                                     |
+| -------------- | ------------------------------ | ----------------------------------------- |
+| Linux x86_64   | `artscii-linux-x86_64`         | Small; see the note below                 |
+| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  | Self-contained bundle (for `install.sh`)  |
+| Linux ARM64    | `artscii-linux-aarch64`        | Small; see the note below                 |
+| Linux ARM64    | `artscii-linux-aarch64.tar.gz` | Self-contained bundle (for `install.sh`)  |
+| macOS x86_64   | `artscii-macos-x86_64`         |                                           |
+| macOS ARM64    | `artscii-macos-aarch64`        |                                           |
+| Windows x86_64 | `artscii-windows-x86_64.exe`   |                                           |
 
 Each asset ships with a matching `.sha256` checksum, plus an aggregated
 `SHA256SUMS` file. After downloading:
 
 ```bash
-# Linux (tar.gz with bundled libraries)
+# Linux, self-contained tarball (libraries included, works on any distro)
 tar xzf artscii-linux-x86_64.tar.gz
 ./artscii --help
 
@@ -151,6 +173,16 @@ tar xzf artscii-linux-x86_64.tar.gz
 chmod +x artscii-macos-x86_64
 ./artscii-macos-x86_64
 ```
+
+> [!IMPORTANT]
+> The standalone `artscii-linux-*` binaries are built on Ubuntu 24.04 and link
+> that release's ffmpeg generation (`libavcodec.so.60`, `libavutil.so.58`, ...),
+> which makes them Ubuntu 24.04 LTS-only in practice (Mint 22, Pop!_OS 24.04 and
+> similar derivatives included). Debian 13, Fedora, Arch and Ubuntu 25.04+ all
+> ship a different ffmpeg soname and fail with
+> `libavutil.so.58: cannot open shared object file`. Use the tarball, a native
+> package, or build from source there. (glibc is not the limit: the binary only
+> needs 2.34.)
 
 > [!NOTE]
 > Linux tarballs bundle required ffmpeg/alsa libraries — no extra packages
@@ -318,13 +350,16 @@ Building from source requires system libraries for video and audio support.
 
 ### Dependencies
 
-| Platform | Build dependencies                                                                                        |
-| -------- | --------------------------------------------------------------------------------------------------------- |
-| Nix      | `nix develop` (all deps included)                                                                         |
-| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel`                                                                 |
-| Debian   | `libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libasound2-dev libclang-dev` |
-| Arch     | `ffmpeg alsa-lib clang`                                                                                   |
-| macOS    | `brew install ffmpeg`                                                                                     |
+| Platform | Build dependencies                                                                                                                                                     |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Nix      | `nix develop` (all deps included)                                                                                                                                      |
+| Fedora   | `gcc pkgconf-pkg-config clang-devel ffmpeg-free-devel alsa-lib-devel`                                                                                                  |
+| Debian   | `build-essential pkg-config libclang-dev libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libavdevice-dev libswscale-dev libswresample-dev libasound2-dev` |
+| Arch     | `base-devel pkgconf clang ffmpeg alsa-lib`                                                                                                                             |
+| macOS    | `brew install ffmpeg`                                                                                                                                                  |
+
+The video support is the default `video` feature; with `--no-default-features`
+only the base Rust toolchain is needed.
 
 ```bash
 # CLI binary at ./result/bin/artscii

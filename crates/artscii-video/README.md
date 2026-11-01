@@ -44,13 +44,13 @@ crates.
 
 Video support requires `ffmpeg` development libraries and `clang` for bindgen:
 
-| Platform | Build dependencies                                                                                        |
-| -------- | --------------------------------------------------------------------------------------------------------- |
-| Nix      | `nix develop` (everything included)                                                                       |
-| Fedora   | `ffmpeg-devel alsa-lib-devel clang-devel`                                                                 |
-| Debian   | `libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libasound2-dev libclang-dev` |
-| Arch     | `ffmpeg alsa-lib clang`                                                                                   |
-| macOS    | `brew install ffmpeg`                                                                                     |
+| Platform | Build dependencies                                                                                                          |
+| -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Nix      | `nix develop` (everything included)                                                                                         |
+| Fedora   | `gcc pkgconf-pkg-config clang-devel ffmpeg-free-devel alsa-lib-devel`                                                       |
+| Debian   | `build-essential pkg-config libclang-dev libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libavdevice-dev libswscale-dev libswresample-dev libasound2-dev` |
+| Arch     | `base-devel pkgconf clang ffmpeg alsa-lib`                                                                                  |
+| macOS    | `brew install ffmpeg`                                                                                                       |
 
 ## License
 

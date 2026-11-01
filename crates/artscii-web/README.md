@@ -22,7 +22,8 @@ client-side via WebAssembly, with no server and no upload.
 ## Development
 
 The Nix dev shell provides the `wasm32-unknown-unknown` target, Trunk, wrangler,
-and a `wasm-bindgen-cli` pinned to the workspace's `wasm-bindgen` version:
+and `wasm-bindgen-cli` from nixpkgs' versioned `wasm-bindgen-cli_0_2_126`
+attribute, which matches the `wasm-bindgen` version pinned in this crate:
 
 ```bash
 nix develop
