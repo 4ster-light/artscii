@@ -1,11 +1,12 @@
 [package]
 name = "artscii-web"
-version = "2.0.1"
-edition = "2024"
-authors = ["4ster-light"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
 description = "Web interface for ArtSCII - convert images to ASCII art in the browser"
-license = "MIT"
-repository = "https://github.com/4ster-light/artscii"
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 # ArtSCII core functionality
@@ -19,7 +20,7 @@ leptos = { version = "0.8", features = ["csr"] }
 image = "0.25"
 
 # WASM utilities
-wasm-bindgen = "0.2"
+wasm-bindgen = "=0.2.126"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
 web-sys = { version = "0.3", features = [

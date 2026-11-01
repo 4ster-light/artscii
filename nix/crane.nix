@@ -15,18 +15,23 @@ let
   rustToolchain = pkgs.rust-bin.fromRustupToolchainFile (root + "/rust-toolchain.toml");
   craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
 
-  # Package metadata is sourced from the Cargo manifests so the flake does not
-  # have to be touched on a version bump.
-  cargoToml = fromTOML (builtins.readFile (root + "/crates/artscii-cli/Cargo.toml"));
-  webCargoToml = fromTOML (builtins.readFile (root + "/crates/artscii-web/Cargo.toml"));
+  # Package metadata comes from the manifests so the flake never needs touching
+  # on a version bump. Shared fields live in `[workspace.package]` (crates
+  # inherit them with `version.workspace = true`, which TOML loads as
+  # `{ workspace = true; }`), so they are read from the workspace table instead
+  # of the per-crate ones; only per-crate fields such as `description` and the
+  # `[[bin]]` name come from the individual manifests.
+  workspacePackage = (lib.importTOML (root + "/Cargo.toml")).workspace.package;
+  cargoToml = lib.importTOML (root + "/crates/artscii-cli/Cargo.toml");
+  webCargoToml = lib.importTOML (root + "/crates/artscii-web/Cargo.toml");
   cliPackage = cargoToml.package;
   webPackage = webCargoToml.package;
 
   # The CLI crate builds a binary named `${binName}`, not the package name.
   binName = (builtins.head cargoToml.bin).name;
-  # All shipped crates are versioned in lockstep; the CLI is the source.
-  version = cliPackage.version;
-  repository = cliPackage.repository;
+  # Every crate inherits these from `[workspace.package]`.
+  version = workspacePackage.version;
+  repository = workspacePackage.repository;
 
   cliMeta = {
     description = cliPackage.description;
@@ -38,7 +43,7 @@ let
 
   webMeta = {
     description = webPackage.description;
-    homepage = webPackage.repository;
+    homepage = repository;
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
@@ -114,7 +119,7 @@ let
     commonArgs
     // {
       pname = "${webPackage.name}-deps";
-      version = webPackage.version;
+      inherit version;
       src = webSource;
       CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
       cargoExtraArgs = "--locked -p artscii-web";
@@ -126,7 +131,7 @@ let
     commonArgs
     // {
       pname = webPackage.name;
-      version = webPackage.version;
+      inherit version;
       src = webSource;
       cargoArtifacts = webCargoArtifacts;
       CARGO_BUILD_TARGET = "wasm32-unknown-unknown";

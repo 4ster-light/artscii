@@ -1,11 +1,12 @@
 [package]
 name = "artscii-cli"
-version = "2.0.1"
-edition = "2024"
-authors = ["4ster-light"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
 description = "Command-line interface for ArtSCII"
-license = "MIT"
-repository = "https://github.com/4ster-light/artscii"
+license.workspace = true
+repository.workspace = true
 keywords = ["ascii", "art", "image", "cli", "terminal"]
 categories = ["command-line-utilities", "multimedia::images", "multimedia::video"]
 

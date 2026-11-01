@@ -7,3 +7,18 @@ members = [
     "crates/artscii-web",
 ]
 resolver = "2"
+
+# Metadata shared by every workspace member. Crates inherit these with
+# `version.workspace = true` and friends, so a release bump only touches this
+# file (and the flake reads it from here).
+#
+# `rust-version` is the lowest toolchain that builds the CLI and its
+# dependencies (`Option::as_chunks` in `artscii-video` needs 1.88); leptos in
+# `artscii-web` happens to require the same version.
+[workspace.package]
+version = "2.0.1"
+edition = "2024"
+rust-version = "1.88"
+authors = ["4ster-light"]
+license = "MIT"
+repository = "https://github.com/4ster-light/artscii"

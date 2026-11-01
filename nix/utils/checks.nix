@@ -80,7 +80,7 @@
           commonArgs
           // {
             pname = "${webPackage.name}-clippy";
-            version = webPackage.version;
+            inherit version;
             src = webSource;
             cargoArtifacts = webCargoArtifacts;
             CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
