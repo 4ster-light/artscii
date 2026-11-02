@@ -65,6 +65,27 @@ The project is organized as a Cargo workspace with the following crates:
 | [`artscii-web`](crates/artscii-web)     | Browser-based WASM converter                    | Binary (WASM) |
 | [`artscii-cli`](crates/artscii-cli)     | Command-line interface                          | Binary        |
 
+```mermaid
+graph TD
+    core["artscii-core<br/>config, errors, dithering"]
+    img["artscii-img<br/>image decode + ASCII"]
+    video["artscii-video<br/>video decode + encode"]
+    cli["artscii-cli<br/>binary: artscii"]
+    web["artscii-web<br/>Leptos CSR / WASM"]
+    ffmpeg["ffmpeg-next<br/>codec, format, swscale, swresample"]
+    cpal["cpal<br/>optional audio feature"]
+
+    img --> core
+    video --> core
+    video --> img
+    cli --> img
+    cli -. "optional video" .-> video
+    web --> core
+    web --> img
+    video --> ffmpeg
+    video -. "audio" .-> cpal
+```
+
 The three library crates (`core`, `img`, `video`) are designed to be usable from
 other Rust projects. See each crate's README for details.
 
