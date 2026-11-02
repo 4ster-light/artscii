@@ -33,3 +33,6 @@ default = []
 # Terminal audio playback (cpal -> ALSA/CoreAudio). MP4 audio passthrough uses
 # ffmpeg directly and works without this.
 audio = ["dep:cpal"]
+# Link against a static ffmpeg (see `PKG_CONFIG_ALL_STATIC` / `ffmpeg-next/static`).
+# Only the portable musl builds use this; native packages take the shared one.
+static-ffmpeg = ["ffmpeg-next/static"]

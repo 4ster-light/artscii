@@ -23,6 +23,8 @@ default = ["video", "audio"]
 video = ["dep:artscii-video"]
 # Terminal audio playback during `--video`; implies `video`.
 audio = ["video", "artscii-video/audio"]
+# Link a static ffmpeg instead of the system shared libraries.
+static-ffmpeg = ["artscii-video/static-ffmpeg"]
 
 [[bin]]
 name = "artscii"
