@@ -1,0 +1,30 @@
+# ArtSCII in a container: full features (video decode, GIF/MP4 export, audio)
+# without installing anything on the host.
+#
+#   podman build -f packaging/container/Containerfile -t artscii .
+#   podman run --rm -v "$PWD:/work:z" -w /work artscii image.jpg -o out.html
+#
+# The `:z` on the bind mount is required on SELinux hosts (Fedora/RHEL), where
+# an unlabelled bind mount is not readable by the container. Audio needs
+# `--device /dev/snd` (or a PulseAudio/PipeWire socket) and a TTY, e.g.
+#   podman run --rm -it --device /dev/snd -v "$PWD:/work:z" -w /work artscii video.mp4 --video
+#
+# Alpine 3.24 matters twice: its `rust` package (1.96) is dynamically linked
+# against musl, so bindgen can dlopen libclang (the rustup toolchain in
+# rust:alpine is static and cannot), and it is a stable release with a new
+# enough compiler for edition 2024 + Option::as_chunks.
+FROM alpine:3.24 AS build
+RUN apk add --no-cache \
+      musl-dev ffmpeg-dev alsa-lib-dev \
+      clang clang22-libclang pkgconf make \
+      rust cargo
+# bindgen's libclang lookup does not search Alpine's /usr/lib/llvmNN/lib.
+ENV LIBCLANG_PATH=/usr/lib/llvm22/lib
+WORKDIR /src
+COPY . .
+RUN cargo build --release --locked -p artscii-cli --features video,audio
+
+FROM alpine:3.24
+RUN apk add --no-cache ffmpeg
+COPY --from=build /src/target/release/artscii /usr/local/bin/artscii
+ENTRYPOINT ["/usr/local/bin/artscii"]

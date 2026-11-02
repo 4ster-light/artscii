@@ -199,3 +199,59 @@ jobs:
         with:
           files: sums/SHA256SUMS
           prerelease: ${{ contains(github.ref_name, '-') }}
+
+  container:
+    name: Build container image (${{ matrix.arch }})
+    needs: build
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          docker build \
+            --file packaging/container/Containerfile \
+            --tag "ghcr.io/${{ github.repository }}:${tag}-${{ matrix.arch }}" \
+            .
+
+      - name: Push image
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          docker push "ghcr.io/${{ github.repository }}:${tag}-${{ matrix.arch }}"
+
+  container-manifest:
+    name: Publish multi-arch container manifest
+    needs: container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Create and push manifest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          image="ghcr.io/${{ github.repository }}"
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          docker manifest create "$image:$tag" "$image:${tag}-amd64" "$image:${tag}-arm64"
+          docker manifest push "$image:$tag"
+          if [ "${tag#*-}" = "$tag" ]; then
+            docker manifest create "$image:latest" "$image:${tag}-amd64" "$image:${tag}-arm64"
+            docker manifest push "$image:latest"
+          fi

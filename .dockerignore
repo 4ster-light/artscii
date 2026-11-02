@@ -1,0 +1,7 @@
+# Keep the container build context small: only the sources are needed.
+target/
+result
+result-*
+.git/
+.direnv/
+.local/
