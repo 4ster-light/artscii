@@ -42,6 +42,9 @@ crates.
 
 ### Build dependencies
 
+The `audio` feature (terminal playback through `cpal`) is optional; MP4 audio
+passthrough uses ffmpeg directly. Building without it needs no ALSA headers.
+
 Video support requires `ffmpeg` development libraries and `clang` for bindgen:
 
 | Platform | Build dependencies                                                                                                          |

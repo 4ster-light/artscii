@@ -61,6 +61,7 @@ version bump either.
 | `Makefile` (`srpm` target)             | Entry point COPR uses for SCM builds        |
 | `packaging/fedora/artscii.spec`        | Fedora/COPR spec (COPR project `4ster-light/artscii`) |
 | `packaging/fedora/Makefile`            | Fetches `Source0`, builds the SRPM          |
+| `packaging/container/Containerfile`    | Alpine image with full ffmpeg, pushed to GHCR on tags |
 
 The spec builds from source with `--locked` (no vendoring, no bundling), so the
 COPR project must keep **"enable internet access during builds"** on: the
@@ -77,8 +78,12 @@ works via `libopenh264` on Fedora and `libx264` on Arch).
   `artscii-img/cli`.
 - `artscii-img/cli` enables `artscii-core/cli` + the `colored` crate for ANSI
   output.
-- `artscii-cli` has a `video` feature (default on) that pulls in
-  `artscii-video`.
+- `artscii-cli` has `video` (decoding, GIF/MP4 export, MP4 audio passthrough)
+  and `audio` (terminal playback via cpal, implies `video`) features, both on by
+  default. `--no-default-features --features video` builds without cpal/ALSA.
+- `artscii-video` exposes the same `audio` feature and depends on `ffmpeg-next`
+  with only `codec`, `format`, `software-scaling` and `software-resampling`, so
+  libavdevice/libavfilter (and with them ALSA) are never linked.
 - `artscii-web` uses `artscii-img` with `default-features = false` to skip the
   `colored`/ANSI dependency.
 
@@ -187,6 +192,11 @@ rust-overlay-applied `pkgs`, and the modules above.
 
 ## Gotchas
 
+- The container image is built on **Alpine 3.24** and uses `apk`'s dynamically
+  linked `rust`/`cargo`, not `rust:alpine`: the rustup toolchain in that image
+  is static-musl, and bindgen cannot `dlopen` libclang from a static binary
+  ("Dynamic loading not supported"). `LIBCLANG_PATH` must point at
+  `/usr/lib/llvm22/lib`, which bindgen does not search on Alpine.
 - `nix build` only sees **git-tracked** files. New files must be committed (or
   `git add`-ed) before they're visible to the Nix build. This includes new
   flake/nix files and `rust-toolchain.toml`.

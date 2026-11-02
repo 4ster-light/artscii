@@ -24,6 +24,7 @@ a video conversion crate, a CLI binary, and a web app built on WASM.
 - [Using the crate](#using-the-crate)
 - [Installation](#installation)
   - [Fedora (COPR)](#fedora-copr)
+  - [Container](#container)
   - [cargo-binstall](#cargo-binstall)
   - [Install script](#install-script)
   - [Prebuilt binaries](#prebuilt-binaries)
@@ -105,6 +106,29 @@ The package links the distribution's ffmpeg and ALSA libraries, so codec
 support follows the ffmpeg package you have installed, and `dnf remove artscii`
 cleans up after it. Source is in `packaging/fedora/` if you prefer to build the
 RPM yourself.
+
+### Container
+
+A full-featured image (video, GIF/MP4 export, audio) is published to the GitHub
+Container Registry on every release:
+
+```bash
+podman run --rm -v "$PWD:/work:z" -w /work ghcr.io/4ster-light/artscii image.jpg -o out.html
+```
+
+Rebuild it yourself with `podman build -f packaging/container/Containerfile -t artscii .`.
+
+Notes:
+
+- The `:z` on the bind mount is required on SELinux hosts (Fedora/RHEL);
+  without it the container cannot read the mounted files.
+- Interactive output and video playback need a TTY (`podman run -it`), and audio
+  playback additionally needs `--device /dev/snd` (or a PulseAudio/PipeWire
+  socket mount).
+- Output files are written into the mounted directory and end up owned by you
+  (rootless podman maps the container's root to your user).
+- The image is Alpine-based (~58 MB compressed) and bundles ffmpeg, so nothing
+  has to be installed on the host.
 
 ### cargo-binstall
 
@@ -358,8 +382,14 @@ Building from source requires system libraries for video and audio support.
 | Arch     | `base-devel pkgconf clang ffmpeg alsa-lib`                                                                                                                             |
 | macOS    | `brew install ffmpeg`                                                                                                                                                  |
 
-The video support is the default `video` feature; with `--no-default-features`
-only the base Rust toolchain is needed.
+ALSA is only needed for the default `audio` feature (terminal playback); MP4
+audio passthrough uses ffmpeg directly. Feature combinations:
+
+```bash
+cargo build --release                                  # images + video + audio
+cargo build --release --no-default-features --features video   # no audio, no ALSA
+cargo build --release --no-default-features            # image conversion only
+```
 
 ```bash
 # CLI binary at ./result/bin/artscii
