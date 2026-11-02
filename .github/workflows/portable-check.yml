@@ -1,15 +1,12 @@
-name: Portable build check (temporary)
+name: Portable build check
 
-# Temporary workflow used to iterate on the static musl build without burning a
-# release tag: it mirrors the Linux jobs of release.yml (static FFmpeg, musl
-# cross build) on both architectures and smoke-tests the artifact.
-# Delete once the aarch64 static build is confirmed green in a release.
+# On-demand check for the static musl build. It mirrors the Linux jobs of
+# release.yml (static FFmpeg, musl cross build) on both architectures and
+# smoke-tests the artifact, so ffmpeg bumps or toolchain changes can be
+# validated without burning a release tag.
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/portable-check.yml
 
 permissions:
   contents: read
