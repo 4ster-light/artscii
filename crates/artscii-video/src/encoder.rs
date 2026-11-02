@@ -104,8 +104,17 @@ fn write_mp4(conversion: &VideoConversion, output: Option<&Path>) -> Result<()> 
         .format()
         .flags()
         .contains(ffmpeg::format::Flags::GLOBAL_HEADER);
-    let codec =
-        ffmpeg::encoder::find(ffmpeg::codec::Id::H264).context("H264 encoder not available")?;
+    // Prefer H.264 (libx264/openh264 when the ffmpeg build has them) and fall
+    // back to MPEG-4 Part 2, which every ffmpeg ships. The portable static
+    // builds link no external encoder libraries, so they take the fallback.
+    let codec = match ffmpeg::encoder::find(ffmpeg::codec::Id::H264) {
+        Some(codec) => codec,
+        None => {
+            eprintln!("note: no H.264 encoder available, exporting MPEG-4 Part 2 instead");
+            ffmpeg::encoder::find(ffmpeg::codec::Id::MPEG4)
+                .context("no MP4 video encoder available (tried h264 and mpeg4)")?
+        }
+    };
     let mut encoder = ffmpeg::codec::context::Context::new_with_codec(codec)
         .encoder()
         .video()?;
