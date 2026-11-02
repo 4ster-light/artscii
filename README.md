@@ -23,12 +23,13 @@ a video conversion crate, a CLI binary, and a web app built on WASM.
 - [Workspace](#workspace)
 - [Using the crate](#using-the-crate)
 - [Installation](#installation)
+  - [Which method should I use?](#which-method-should-i-use)
   - [Fedora (COPR)](#fedora-copr)
+  - [Nix](#nix)
   - [Container](#container)
   - [cargo-binstall](#cargo-binstall)
   - [Install script](#install-script)
   - [Prebuilt binaries](#prebuilt-binaries)
-  - [Nix](#nix)
   - [Cargo](#cargo)
 - [Usage](#usage)
   - [Options](#options)
@@ -93,6 +94,19 @@ The CLI crate builds the `artscii` binary.
 
 ## Installation
 
+### Which method should I use?
+
+| Your situation                                                  | Recommended                       | What you get                                                                |
+| --------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------- |
+| Fedora 44, 45 or rawhide                                        | [Fedora (COPR)](#fedora-copr)     | Native package, updated by `dnf`, uses the system ffmpeg                    |
+| NixOS or Nix                                                    | [Nix](#nix)                       | Flake package, NixOS/home-manager modules, overlay                          |
+| Immutable distro, CI, or you want nothing installed on the host | [Container](#container)           | Full features inside an Alpine image (~58 MB compressed)                    |
+| macOS or Windows                                                | [cargo-binstall](#cargo-binstall) | Prebuilt binary, no extra runtime libraries needed                          |
+| Any glibc Linux without a toolchain                             | [Install script](#install-script) | Self-contained tarball with the ffmpeg/ALSA libraries bundled (glibc 2.34+) |
+| You already have Rust and ffmpeg                                | [Cargo](#cargo)                   | Built against your own ffmpeg, video and audio included                     |
+
+Every method below provides video and audio support except where noted.
+
 ### Fedora (COPR)
 
 Fedora 44, 45 and rawhide, x86_64 and aarch64:
@@ -106,111 +120,6 @@ The package links the distribution's ffmpeg and ALSA libraries, so codec
 support follows the ffmpeg package you have installed, and `dnf remove artscii`
 cleans up after it. Source is in `packaging/fedora/` if you prefer to build the
 RPM yourself.
-
-### Container
-
-A full-featured image (video, GIF/MP4 export, audio) is published to the GitHub
-Container Registry on every release:
-
-```bash
-podman run --rm -v "$PWD:/work:z" -w /work ghcr.io/4ster-light/artscii image.jpg -o out.html
-```
-
-Rebuild it yourself with `podman build -f packaging/container/Containerfile -t artscii .`.
-
-Notes:
-
-- The `:z` on the bind mount is required on SELinux hosts (Fedora/RHEL);
-  without it the container cannot read the mounted files.
-- Interactive output and video playback need a TTY (`podman run -it`), and audio
-  playback additionally needs `--device /dev/snd` (or a PulseAudio/PipeWire
-  socket mount).
-- Output files are written into the mounted directory and end up owned by you
-  (rootless podman maps the container's root to your user).
-- The image is Alpine-based (~58 MB compressed) and bundles ffmpeg, so nothing
-  has to be installed on the host.
-
-### cargo-binstall
-
-[cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installs a
-prebuilt binary from GitHub Releases. The crate is not published to crates.io,
-so point binstall at the repository:
-
-```bash
-# Install cargo-binstall once (see its README for a prebuilt installer)
-cargo install cargo-binstall
-
-# Install ArtSCII
-cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
-```
-
-> [!WARNING]
-> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** it
-> falls back to compiling from source (needs a Rust toolchain plus ffmpeg, ALSA
-> and clang), because the prebuilt Linux binary is only usable on ffmpeg 6
-> systems — see [Prebuilt binaries](#prebuilt-binaries). Use the
-> [install script](#install-script) if you want the self-contained bundle.
-
-### Install script
-
-Linux and macOS, no Rust toolchain required:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/4ster-light/artscii/main/install.sh | sh
-```
-
-Windows (PowerShell):
-
-```powershell
-irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
-```
-
-The script installs into `~/.local/bin`
-(`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
-`ARTSCII_INSTALL_DIR` (or `$env:ARTSCII_INSTALL_DIR`), and select a specific
-release with `ARTSCII_VERSION` (for example `v2.0.0`).
-
-### Prebuilt binaries
-
-Download the asset for your platform from the
-[latest release](https://github.com/4ster-light/artscii/releases/latest):
-
-| Platform       | Asset                          | Notes                                     |
-| -------------- | ------------------------------ | ----------------------------------------- |
-| Linux x86_64   | `artscii-linux-x86_64`         | Small; see the note below                 |
-| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  | Self-contained bundle (for `install.sh`)  |
-| Linux ARM64    | `artscii-linux-aarch64`        | Small; see the note below                 |
-| Linux ARM64    | `artscii-linux-aarch64.tar.gz` | Self-contained bundle (for `install.sh`)  |
-| macOS x86_64   | `artscii-macos-x86_64`         |                                           |
-| macOS ARM64    | `artscii-macos-aarch64`        |                                           |
-| Windows x86_64 | `artscii-windows-x86_64.exe`   |                                           |
-
-Each asset ships with a matching `.sha256` checksum, plus an aggregated
-`SHA256SUMS` file. After downloading:
-
-```bash
-# Linux, self-contained tarball (libraries included, works on any distro)
-tar xzf artscii-linux-x86_64.tar.gz
-./artscii --help
-
-# macOS / Windows
-chmod +x artscii-macos-x86_64
-./artscii-macos-x86_64
-```
-
-> [!IMPORTANT]
-> The standalone `artscii-linux-*` binaries are built on Ubuntu 24.04 and link
-> that release's ffmpeg generation (`libavcodec.so.60`, `libavutil.so.58`, ...),
-> which makes them Ubuntu 24.04 LTS-only in practice (Mint 22, Pop!_OS 24.04 and
-> similar derivatives included). Debian 13, Fedora, Arch and Ubuntu 25.04+ all
-> ship a different ffmpeg soname and fail with
-> `libavutil.so.58: cannot open shared object file`. Use the tarball, a native
-> package, or build from source there. (glibc is not the limit: the binary only
-> needs 2.34.)
-
-> [!NOTE]
-> Linux tarballs bundle required ffmpeg/alsa libraries — no extra packages
-> needed at runtime. macOS and Windows include video support natively.
 
 ### Nix
 
@@ -277,6 +186,119 @@ home.packages = [ inputs.artscii.packages.${pkgs.system}.artscii ];
 # home.packages = [ pkgs.artscii ];
 ```
 
+### Container
+
+A full-featured image (video, GIF/MP4 export, audio) is published to the GitHub
+Container Registry on every release. It is tagged `:latest` for stable
+releases, `:X.Y.Z` for a specific stable release and `:X.Y.Z-rc.N` for release
+candidates; until the first stable image exists, use `:2.1.0-rc.1`.
+
+```bash
+podman run --rm -v "$PWD:/work:z" -w /work \
+  ghcr.io/4ster-light/artscii:latest image.jpg -o out.html
+```
+
+Rebuild it yourself with `podman build -f packaging/container/Containerfile -t artscii .`.
+
+Notes:
+
+- The `:z` on the bind mount is required on SELinux hosts (Fedora/RHEL);
+  without it the container cannot read the mounted files.
+- Interactive output and video playback need a TTY (`podman run -it`), and audio
+  playback additionally needs `--device /dev/snd` (or a PulseAudio/PipeWire
+  socket mount).
+- Output files are written into the mounted directory and end up owned by you
+  (rootless podman maps the container's root to your user).
+- The image is Alpine-based (~58 MB compressed) and bundles ffmpeg, so nothing
+  has to be installed on the host.
+
+### cargo-binstall
+
+[cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installs a
+prebuilt binary from GitHub Releases. The crate is not published to crates.io,
+so point binstall at the repository:
+
+```bash
+# Install cargo-binstall once (see its README for a prebuilt installer)
+cargo install cargo-binstall
+
+# Install ArtSCII
+cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
+```
+
+> [!WARNING]
+> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** it
+> falls back to compiling from source (needs a Rust toolchain plus ffmpeg, ALSA
+> and clang), because the prebuilt Linux binary is only usable on ffmpeg 6
+> systems; see [Prebuilt binaries](#prebuilt-binaries). Use the
+> [install script](#install-script) if you want the self-contained bundle.
+
+### Install script
+
+Linux and macOS, no Rust toolchain required:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/4ster-light/artscii/main/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
+```
+
+On Linux the script downloads the self-contained tarball, so ffmpeg and ALSA
+travel with the binary; it needs glibc 2.34 or newer (Ubuntu 22.04, Debian 12,
+Fedora 35 and later). On macOS it installs the standalone binary.
+
+The script installs into `~/.local/bin`
+(`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
+`ARTSCII_INSTALL_DIR` (or `$env:ARTSCII_INSTALL_DIR`), and select a specific
+release with `ARTSCII_VERSION` (for example `v2.1.0`).
+
+### Prebuilt binaries
+
+Download the asset for your platform from the
+[latest release](https://github.com/4ster-light/artscii/releases/latest):
+
+| Platform       | Asset                          | Notes                                     |
+| -------------- | ------------------------------ | ----------------------------------------- |
+| Linux x86_64   | `artscii-linux-x86_64`         | Small; see the note below                 |
+| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  | Self-contained bundle (for `install.sh`)  |
+| Linux ARM64    | `artscii-linux-aarch64`        | Small; see the note below                 |
+| Linux ARM64    | `artscii-linux-aarch64.tar.gz` | Self-contained bundle (for `install.sh`)  |
+| macOS x86_64   | `artscii-macos-x86_64`         |                                           |
+| macOS ARM64    | `artscii-macos-aarch64`        |                                           |
+| Windows x86_64 | `artscii-windows-x86_64.exe`   |                                           |
+
+Each asset ships with a matching `.sha256` checksum, plus an aggregated
+`SHA256SUMS` file. After downloading:
+
+```bash
+# Linux, self-contained tarball (libraries included, glibc 2.34+)
+tar xzf artscii-linux-x86_64.tar.gz
+./artscii --help
+
+# macOS / Windows
+chmod +x artscii-macos-x86_64
+./artscii-macos-x86_64
+```
+
+> [!IMPORTANT]
+> The standalone `artscii-linux-*` binaries are built on Ubuntu 24.04 and link
+> that release's ffmpeg generation (`libavcodec.so.60`, `libavutil.so.58`, ...),
+> which makes them Ubuntu 24.04 LTS-only in practice (Mint 22, Pop!_OS 24.04 and
+> similar derivatives included). Debian 13, Fedora, Arch and Ubuntu 25.04+ all
+> ship a different ffmpeg soname and fail with
+> `libavutil.so.58: cannot open shared object file`. Use the tarball, a native
+> package, or build from source there. (glibc is not the limit: the binary only
+> needs 2.34.)
+
+> [!NOTE]
+> Linux tarballs bundle the required ffmpeg/alsa libraries, so no extra
+> packages are needed at runtime. macOS and Windows include video support
+> natively.
+
 ### Cargo
 
 Install the CLI from source (the crate builds the `artscii` binary):
@@ -285,13 +307,23 @@ Install the CLI from source (the crate builds the `artscii` binary):
 cargo install --locked --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
-The `video` feature is enabled by default. Pass `--no-default-features` to skip
-`ffmpeg`/audio when you only need image conversion:
+The default build includes video decoding, GIF/MP4 export and terminal audio
+playback. To drop audio playback (and the ALSA dependency) but keep video:
+
+```bash
+cargo install --locked --no-default-features --features video \
+  --git https://github.com/4ster-light/artscii artscii-cli
+```
+
+For image conversion only:
 
 ```bash
 cargo install --locked --no-default-features \
   --git https://github.com/4ster-light/artscii artscii-cli
 ```
+
+Arch Linux has no AUR package yet, so `cargo` (or the container) is the way to
+install it there today.
 
 ## Usage
 
@@ -374,13 +406,13 @@ Building from source requires system libraries for video and audio support.
 
 ### Dependencies
 
-| Platform | Build dependencies                                                                                                                                                     |
-|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Nix      | `nix develop` (all deps included)                                                                                                                                      |
-| Fedora   | `gcc pkgconf-pkg-config clang-devel ffmpeg-free-devel alsa-lib-devel`                                                                                                  |
-| Debian   | `build-essential pkg-config libclang-dev libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libavdevice-dev libswscale-dev libswresample-dev libasound2-dev` |
-| Arch     | `base-devel pkgconf clang ffmpeg alsa-lib`                                                                                                                             |
-| macOS    | `brew install ffmpeg`                                                                                                                                                  |
+| Platform   | Build dependencies                                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Nix        | `nix develop` (all deps included)                                                                                                                                        |
+| Fedora     | `gcc pkgconf-pkg-config clang-devel ffmpeg-free-devel alsa-lib-devel`                                                                                                    |
+| Debian     | `build-essential pkg-config libclang-dev libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libavdevice-dev libswscale-dev libswresample-dev libasound2-dev`   |
+| Arch       | `base-devel pkgconf clang ffmpeg alsa-lib`                                                                                                                               |
+| macOS      | `brew install ffmpeg`                                                                                                                                                    |
 
 ALSA is only needed for the default `audio` feature (terminal playback); MP4
 audio passthrough uses ffmpeg directly. Feature combinations:
