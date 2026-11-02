@@ -74,8 +74,13 @@ jobs:
       - name: Install system dependencies (Linux static build)
         if: matrix.static
         run: |
+          set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq musl-tools libclang-dev pkg-config nasm
+          sudo apt-get install -y -qq musl-tools musl-dev libclang-dev pkg-config nasm
+          echo "arch: $(uname -m)"
+          command -v musl-gcc || { echo "::error::musl-gcc not found"; exit 1; }
+          musl-gcc --version | head -n1
+          ls -d /usr/include/*-linux-musl
 
       - name: Restore static FFmpeg
         if: matrix.static
@@ -209,7 +214,7 @@ jobs:
           prerelease: ${{ contains(github.ref_name, '-') }}
 
   copr:
-    name: Build RPM in COPR (${{ contains(github.ref_name, '-') && 'artscii-testing' || 'artscii' }})
+    name: Build RPM in COPR
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -262,7 +267,7 @@ jobs:
           copr-cli build "4ster-light/$project" "$srpm" --nowait
 
   container:
-    name: Build container image (${{ matrix.arch }})
+    name: Build container image
     needs: build
     runs-on: ${{ matrix.os }}
     permissions:
