@@ -1,0 +1,62 @@
+name: Portable build check (temporary)
+
+# Temporary workflow used to iterate on the static musl build on the arm64
+# runner without burning a release tag. Runs only when this file changes, or
+# manually. Delete once the aarch64 static build is green.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/portable-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe static FFmpeg configure flags (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: ubuntu-latest
+            arch: amd64
+    steps:
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq musl-tools musl-dev nasm pkg-config
+          echo "arch: $(uname -m)"
+          musl-gcc --version | head -n1
+
+      - name: Probe configure variants
+        run: |
+          set -uo pipefail
+          git clone --depth=1 -b release/9.0 -q https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg
+          cd /tmp/ffmpeg
+          base=(--disable-shared --enable-static --disable-programs --disable-doc
+                --disable-debug --disable-network --disable-autodetect
+                --cc=musl-gcc --extra-cflags="-Os")
+          try() {
+            name="$1"; shift
+            if ./configure "${base[@]}" "$@" >/tmp/cfg-$name.log 2>&1; then
+              echo "VARIANT $name: OK"
+              # keep the tree clean for the next attempt
+              make distclean >/dev/null 2>&1 || true
+              return 0
+            else
+              echo "VARIANT $name: FAILED"
+              grep -iE 'atomics|error' /tmp/cfg-$name.log | tail -n 5
+              make distclean >/dev/null 2>&1 || true
+              return 1
+            fi
+          }
+          try plain || true
+          try latomic --extra-ldflags="-latomic" || true
+          try libatomic --extra-libs="-latomic" || true
+          try noneoutline --extra-cflags="-Os -mno-outline-atomics" || true
+          try combo --extra-cflags="-Os -mno-outline-atomics" --extra-ldflags="-latomic" || true
