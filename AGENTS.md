@@ -215,7 +215,10 @@ submission described under Packaging.
 - Before committing: `nix develop -c cargo fmt --all --check`, `nix flake check`,
   `nix fmt -- --ci`. Packaging changes additionally want
   `make -C packaging/fedora srpm` and a container build.
-- Never move or delete a published tag, and never `--force` push `main`.
+- Never move or delete a **stable** (`vX.Y.Z`) tag, and never `--force` push
+  `main`. Release-candidate tags may be deleted together with their GitHub
+  release once they are broken or superseded (`gh release delete
+  vX.Y.Z-rc.N --cleanup-tag`), but an `rc.N` number is never reused.
 
 ## Flake Layout
 

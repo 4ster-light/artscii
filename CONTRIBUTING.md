@@ -133,6 +133,11 @@ You do not have to do anything manually; just tag.
 Hotfix after a release: branch `fix/<slug>` from the release tag, merge into
 `release/X.Y`, tag `vX.Y.(Z+1)`, then merge `release/X.Y` back into `main`.
 
+Tag hygiene: stable tags (`vX.Y.Z`) are immutable; never delete or move one.
+Release-candidate tags can be removed together with their GitHub release when a
+candidate is broken or superseded (`gh release delete vX.Y.Z-rc.N
+--cleanup-tag`), but the `rc.N` number is never reused.
+
 ## Verify changes
 
 ```bash

@@ -117,16 +117,18 @@ The CLI crate builds the `artscii` binary.
 
 ### Which method should I use?
 
-| Your situation                                                  | Recommended                       | What you get                                                                |
-| --------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------- |
-| Fedora 44, 45 or rawhide                                        | [Fedora (COPR)](#fedora-copr)     | Native package, updated by `dnf`, uses the system ffmpeg                    |
-| NixOS or Nix                                                    | [Nix](#nix)                       | Flake package, NixOS/home-manager modules, overlay                          |
-| Immutable distro, CI, or you want nothing installed on the host | [Container](#container)           | Full features inside an Alpine image (~58 MB compressed)                    |
-| macOS or Windows                                                | [cargo-binstall](#cargo-binstall) | Prebuilt binary, no extra runtime libraries needed                          |
-| Any glibc Linux without a toolchain                             | [Install script](#install-script) | Self-contained tarball with the ffmpeg/ALSA libraries bundled (glibc 2.34+) |
-| You already have Rust and ffmpeg                                | [Cargo](#cargo)                   | Built against your own ffmpeg, video and audio included                     |
+| Your situation | Recommended | What you get |
+| --- | --- | --- |
+| Fedora 44, 45 or rawhide | [Fedora (COPR)](#fedora-copr) | Native package, updated by `dnf`, uses the system ffmpeg, video and audio |
+| NixOS or Nix | [Nix](#nix) | Flake package, NixOS/home-manager modules, overlay, video and audio |
+| Immutable distro, CI, or you want nothing installed on the host | [Container](#container) | Full features inside an Alpine image (~58 MB compressed) |
+| macOS or Windows | [cargo-binstall](#cargo-binstall) | Prebuilt binary with video support |
+| Any Linux without a toolchain, including Alpine, Debian, Ubuntu and Arch | [Install script](#install-script) | Static binary with ffmpeg linked in, no runtime dependencies |
+| You already have Rust and ffmpeg | [Cargo](#cargo) | Built against your own ffmpeg, video and audio |
 
-Every method below provides video and audio support except where noted.
+All methods provide video support (decoding, GIF and MP4 export). Terminal audio
+playback is missing only from the static Linux binary that `install.sh` and
+`cargo binstall` install; MP4 audio passthrough works there too.
 
 ### Fedora (COPR)
 
@@ -266,10 +268,14 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
 ```
 
-On Linux the script installs the static musl binary: ffmpeg is linked in, so
-it runs on any distribution (glibc, musl, Alpine, NixOS, immutable images) with
-nothing installed and no glibc requirement. On macOS it installs the standalone
-binary.
+On Linux the script installs the static musl binary: ffmpeg is linked in, so it
+runs on any distribution (glibc, musl, Alpine, NixOS, immutable images) with
+nothing installed and no glibc requirement. Video, GIF and MP4 export work out
+of the box; terminal audio playback needs a native package, the container or a
+source build. On macOS it installs the standalone binary.
+
+Pinned older releases still work: if the static asset is missing, the script
+falls back to the tarball that shipped before 2.1.0.
 
 The script installs into `~/.local/bin`
 (`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
