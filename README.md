@@ -1,3 +1,5 @@
+<div align="center">
+
 # ✰ArtSCII✰
 
 [![Release](https://img.shields.io/github/v/release/4ster-light/artscii?sort=semver&label=release&color=2f6f4e&style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
@@ -14,8 +16,7 @@
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?logo=githubsponsors&logoColor=white&style=flat-square)](https://github.com/sponsors/4ster-light)
 [![License: MIT](https://img.shields.io/badge/license-MIT-red?style=flat-square)](LICENSE)
 
-A workspace with the shared foundation crate, a reusable image-conversion crate and
-a video conversion crate, a CLI binary, and a web app built on WASM.
+</div>
 
 ## Table of Contents
 
@@ -40,6 +41,8 @@ a video conversion crate, a CLI binary, and a web app built on WASM.
 - [License](#license)
 
 ## Features
+
+A workspace with the shared foundation crate, a reusable image-conversion crate and a video conversion crate, a CLI binary, and a web app built on WASM.
 
 - **Multiple dithering algorithms**: Floyd-Steinberg, Atkinson, and Riemersma
 - **Color support**: ANSI colors for terminal and text output, RGB for HTML
@@ -287,13 +290,13 @@ release with `ARTSCII_VERSION` (for example `v2.1.0`).
 Download the asset for your platform from the
 [latest release](https://github.com/4ster-light/artscii/releases/latest):
 
-| Platform       | Asset                        | Notes                                        |
-| -------------- | ---------------------------- | -------------------------------------------- |
-| Linux x86_64   | `artscii-linux-x86_64`       | Static musl, runs on any Linux, no dependencies |
-| Linux ARM64    | `artscii-linux-aarch64`      | Static musl, runs on any Linux, no dependencies |
-| macOS x86_64   | `artscii-macos-x86_64`       |                                              |
-| macOS ARM64    | `artscii-macos-aarch64`      |                                              |
-| Windows x86_64 | `artscii-windows-x86_64.exe` |                                              |
+| Platform         | Asset                          | Notes                                             |
+| ---------------- | ------------------------------ | ------------------------------------------------- |
+| Linux x86_64     | `artscii-linux-x86_64`         | Static musl, runs on any Linux, no dependencies   |
+| Linux ARM64      | `artscii-linux-aarch64`        | Static musl, runs on any Linux, no dependencies   |
+| macOS x86_64     | `artscii-macos-x86_64`         |                                                   |
+| macOS ARM64      | `artscii-macos-aarch64`        |                                                   |
+| Windows x86_64   | `artscii-windows-x86_64.exe`   |                                                   |
 
 Each asset ships with a matching `.sha256` checksum, plus an aggregated
 `SHA256SUMS` file. After downloading:

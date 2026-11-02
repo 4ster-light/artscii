@@ -29,6 +29,7 @@
           lld
           cargo-binstall
           wrangler
+          actionlint
         ];
         LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
       };
