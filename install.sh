@@ -56,14 +56,33 @@ url="$base/$asset"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
+download() {
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$1" -o "$2"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$2" "$1"
+  else
+    echo "artscii: curl or wget is required" >&2
+    exit 1
+  fi
+}
+
 echo "Downloading $url"
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$url" -o "$tmp/$asset"
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$tmp/$asset" "$url"
-else
-  echo "artscii: curl or wget is required" >&2
-  exit 1
+# v2.1.0 and later ship a single static binary on Linux; older releases ship a
+# tarball with the shared libraries next to the binary. Fall back so pinned
+# versions (ARTSCII_VERSION=v2.0.1) keep working.
+archive=0
+if ! download "$url" "$tmp/$asset"; then
+  case "$asset" in
+    *.tar.gz) ;;
+    *)
+      asset="$asset.tar.gz"
+      url="$base/$asset"
+      echo "Downloading $url"
+      download "$url" "$tmp/$asset" || exit 1
+      archive=1
+      ;;
+  esac
 fi
 
 # Verify the checksum when the release publishes one.
@@ -90,7 +109,13 @@ fi
 
 mkdir -p "$INSTALL_DIR"
 
-cp "$tmp/$asset" "$INSTALL_DIR/$BIN"
+if [ "$archive" = 1 ]; then
+  # Older Linux bundles carry their libraries and an $ORIGIN rpath, so they
+  # have to be extracted together.
+  tar -xzf "$tmp/$asset" -C "$INSTALL_DIR"
+else
+  cp "$tmp/$asset" "$INSTALL_DIR/$BIN"
+fi
 
 chmod 755 "$INSTALL_DIR/$BIN"
 
