@@ -11,27 +11,25 @@ nix flake check      # everything CI runs
 
 ## How the repository fits together
 
-```text
-                    ┌──────────────┐
-                    │ artscii-core │  config, errors, dithering strategies
-                    └──────┬───────┘
-              ┌────────────┴─────────────┐
-              ▼                          ▼
-      ┌──────────────┐           ┌──────────────┐
-      │ artscii-img  │           │ artscii-web  │  Leptos CSR, runs in the
-      └───┬──────┬───┘           └──────────────┘  browser as WASM
-          │      │                    ▲
-          │      ▼                    │ uses artscii-img with
-          │  ┌───────────────┐        │ default-features = false
-          │  │ artscii-video │        │
-          │  └───┬───────┬───┘        │
-          │      │       │            │
-          │      │       └──► cpal    │  only with the `audio` feature
-          │      └──────────► ffmpeg  │  codec/format/scaling/resampling
-          ▼                      ▼
-   ┌──────────────┐        (no libavdevice/libavfilter)
-   │ artscii-cli  │──► binary `artscii`
-   └──────────────┘
+```mermaid
+graph TD
+    core["artscii-core<br/>config, errors, dithering"]
+    img["artscii-img<br/>image decode + ASCII"]
+    video["artscii-video<br/>video decode + encode"]
+    cli["artscii-cli<br/>binary: artscii"]
+    web["artscii-web<br/>Leptos CSR / WASM"]
+    ffmpeg["ffmpeg-next<br/>codec, format, swscale, swresample"]
+    cpal["cpal<br/>optional audio feature"]
+
+    img --> core
+    video --> core
+    video --> img
+    cli --> img
+    cli -. "optional video" .-> video
+    web --> core
+    web --> img
+    video --> ffmpeg
+    video -. "audio" .-> cpal
 ```
 
 Everything shares one `Cargo.toml` workspace, one `Cargo.lock`, one pinned
@@ -40,16 +38,18 @@ versioned and released together; do not split them across branches.
 
 Distribution surface:
 
-```text
-tag vX.Y.Z[-rc.N]
-        │
-        ▼
-  release workflow ──► GitHub release: Linux/macOS/Windows binaries + SHA256SUMS
-        │              GHCR image:      ghcr.io/4ster-light/artscii:X.Y.Z[-rc.N]
-        │              COPR:            stable tags -> 4ster-light/artscii
-        │                               rc tags     -> 4ster-light/artscii-testing
-        ▼
-  install.sh / cargo binstall / dnf copr / podman / nix run
+```mermaid
+flowchart TD
+    tag["git tag vX.Y.Z / vX.Y.Z-rc.N"] --> verify["verify<br/>tag matches workspace version"]
+    verify --> bins["build<br/>Linux, macOS, Windows binaries"]
+    verify --> image["container<br/>amd64 + arm64"]
+    verify --> copr["copr<br/>SRPM, six chroots"]
+    bins --> release["GitHub release<br/>assets + SHA256SUMS"]
+    image --> manifest["multi-arch manifest"]
+    manifest --> ghcr["ghcr.io/4ster-light/artscii"]
+    copr -->|"stable tag"| stable["COPR 4ster-light/artscii"]
+    copr -->|"rc tag"| testing["COPR 4ster-light/artscii-testing"]
+    release --> users["install.sh / cargo binstall / manual download"]
 ```
 
 ## Development workflow
