@@ -14,7 +14,7 @@ nix develop -c cargo check --workspace
 nix develop -c cargo build --release
 nix develop -c cargo test --workspace
 
-# Wrong — will fail on systems without all deps installed
+# Wrong, will fail on systems without all deps installed
 cargo check --workspace
 ```
 
@@ -153,9 +153,10 @@ The `checks` output is what CI runs:
 
 `.github/workflows/ci.yml` runs on pushes to `main`, every pull request, and
 manual dispatch. It is a single `ubuntu-latest` job that installs Nix, restores
-the Nix store from the GitHub Actions cache, runs `nix flake check
---keep-going`, and then checks Nix formatting with `nix fmt -- --ci`. The flake
-check executes exactly the same derivations as `nix flake check` locally.
+the Nix store from the GitHub Actions cache, checks that the spec version
+matches `[workspace.package]`, runs `nix flake check --keep-going`, and then
+checks Nix formatting with `nix fmt -- --ci`. The flake check executes exactly
+the same derivations as `nix flake check` locally.
 
 Why one job instead of one job per check:
 
@@ -170,8 +171,37 @@ binary (`artscii-linux-*`) and `artscii-linux-*.tar.gz`, a self-contained bundle
 with the libraries and an `$ORIGIN` rpath that `install.sh` consumes. The
 standalone binary is built on Ubuntu 24.04, so it is hard-linked to that
 distro's ffmpeg 6 sonames and is *not* wired into `cargo binstall` on Linux;
-the bundle is the portable artifact. The `[workspace.package]` version and the
-pushed tag must match, and nothing in CI enforces that yet.
+the bundle is the portable artifact.
+
+The release workflow starts with a `verify` job that fails unless the pushed tag
+matches `[workspace.package]` (`v2.1.0` and `v2.1.0-rc.3` both require
+`version = "2.1.0"`), and every other job depends on it. It then fans out to the
+binary builds, the GHCR image (amd64 + arm64 + manifest), and the COPR SRPM
+submission described under Packaging.
+
+## Development Workflow
+
+- `main` is protected: the `nix flake check` status check is required, history
+  is linear (squash merges only), force pushes and deletions are blocked, and
+  the head branch is deleted on merge. Admins are exempt, so direct pushes are
+  possible, but treat `nix flake check` as mandatory before pushing anything.
+- Work on short-lived branches (`feat/`, `fix/`, `packaging/`, `chore/`) and
+  squash-merge them. Do not create per-crate branches: one `Cargo.lock`, one
+  `[workspace.package]` version, one flake.
+- `release/<major>.<minor>` is created only when RC fixes need to be isolated
+  from `main`, or when a released version needs a hotfix. Tag RCs from `main`
+  otherwise, and merge the release branch back after the final tag.
+- Use Conventional Commits with the scopes already in the history
+  (`feat(video):`, `ci(release):`, `build(nix):`, `docs:`). Keep lockfile and
+  formatting churn in separate commits.
+- The version is lockstep: `[workspace.package]` in `Cargo.toml` and
+  `Version:` in `packaging/fedora/artscii.spec` must match; CI enforces it.
+  Bump both, move the spec `%changelog`, commit as `chore(release): prepare
+  X.Y.Z`, then tag `vX.Y.Z` or `vX.Y.Z-rc.N`.
+- Before committing: `nix develop -c cargo fmt --all --check`, `nix flake check`,
+  `nix fmt -- --ci`. Packaging changes additionally want
+  `make -C packaging/fedora srpm` and a container build.
+- Never move or delete a published tag, and never `--force` push `main`.
 
 ## Flake Layout
 

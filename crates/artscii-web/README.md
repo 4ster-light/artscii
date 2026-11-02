@@ -78,7 +78,14 @@ nix develop -c trunk build --release
 nix develop -c wrangler pages deploy
 ```
 
-The static bundle can be deployed anywhere you wish, just that <https://artscii.pages.dev> is the cloudflare pages deployment used publicly.
+The deployment is manual and is only done from a tagged release (`vX.Y.Z`) or
+from `main` after `nix flake check` passed. Do not deploy from a feature branch
+to the production project; if you want to preview a branch, use
+`wrangler pages deploy --branch <name>` (Cloudflare creates a preview URL) or
+`trunk serve` locally.
+
+The static bundle can be deployed anywhere you wish, just that
+<https://artscii.pages.dev> is the Cloudflare Pages deployment used publicly.
 
 ## Architecture
 
