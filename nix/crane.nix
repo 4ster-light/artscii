@@ -108,7 +108,7 @@ let
       pname = binName;
       inherit version;
       inherit cargoArtifacts;
-      cargoExtraArgs = "--locked -p ${cliPackage.name} --features video";
+      cargoExtraArgs = "--locked -p ${cliPackage.name} --features video,audio";
       doCheck = false;
       meta = cliMeta;
     }

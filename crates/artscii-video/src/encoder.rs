@@ -25,7 +25,11 @@ pub fn encode_video(conversion: &VideoConversion, output: Option<&Path>) -> Resu
 
 fn write_terminal(conversion: &VideoConversion) -> Result<()> {
     let frame_delay = frame_delay(conversion.frame_rate);
-    let _audio = if conversion.preserve_audio {
+
+    // Audio playback needs cpal; without the `audio` feature, terminal output is
+    // silent and `--preserve-audio` only affects MP4 output.
+    #[cfg(feature = "audio")]
+    let audio = if conversion.preserve_audio {
         Some(std::thread::spawn({
             let input = conversion.input.clone();
             move || {
@@ -43,7 +47,8 @@ fn write_terminal(conversion: &VideoConversion) -> Result<()> {
         std::thread::sleep(frame_delay);
     }
 
-    if let Some(handle) = _audio {
+    #[cfg(feature = "audio")]
+    if let Some(handle) = audio {
         let _ = handle.join();
     }
     Ok(())

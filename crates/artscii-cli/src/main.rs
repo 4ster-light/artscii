@@ -16,6 +16,13 @@ use output::{print_header, print_info, write_output};
 fn main() -> Result<()> {
     let args = Cli::parse();
 
+    #[cfg(all(feature = "video", not(feature = "audio")))]
+    if args.video && args.preserve_audio {
+        eprintln!(
+            "note: this build has no audio playback support; --preserve-audio still copies audio into MP4 output"
+        );
+    }
+
     if args.video {
         #[cfg(feature = "video")]
         {

@@ -16,6 +16,7 @@
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 
+#[cfg(feature = "audio")]
 pub mod audio;
 pub mod config;
 pub mod decoder;

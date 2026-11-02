@@ -18,8 +18,11 @@ artscii-img = { path = "../artscii-img", features = ["cli"] }
 artscii-video = { path = "../artscii-video", optional = true }
 
 [features]
-default = ["video"]
+default = ["video", "audio"]
+# Video decoding, GIF/MP4 export and MP4 audio passthrough.
 video = ["dep:artscii-video"]
+# Terminal audio playback during `--video`; implies `video`.
+audio = ["video", "artscii-video/audio"]
 
 [[bin]]
 name = "artscii"

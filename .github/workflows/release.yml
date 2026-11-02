@@ -112,7 +112,7 @@ jobs:
           "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
 
       - name: Build
-        run: cargo build --release --locked -p artscii-cli --features video --target ${{ matrix.target }}
+        run: cargo build --release --locked -p artscii-cli --features video,audio --target ${{ matrix.target }}
         shell: bash
 
       - name: Strip binary (Unix)

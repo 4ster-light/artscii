@@ -44,7 +44,7 @@ and resizing.
 # written to an unwritable $HOME.
 export CARGO_HOME=%{_builddir}/cargo-home
 export CARGO_NET_RETRY=10
-cargo build --release --locked -p artscii-cli --features video
+cargo build --release --locked -p artscii-cli --features video,audio
 
 %check
 export CARGO_HOME=%{_builddir}/cargo-home
