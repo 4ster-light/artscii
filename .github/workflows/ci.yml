@@ -40,6 +40,21 @@ jobs:
           restore-prefixes-first-match: nix-${{ runner.os }}-
           gc-max-store-size-linux: 6G
 
+      # Keep the packaging metadata in lockstep with the workspace version; the
+      # COPR spec carries its own Version: because RPM needs it, and drift there
+      # silently publishes a mislabelled package.
+      - name: Check packaging versions match the workspace
+        run: |
+          set -euo pipefail
+          version=$(sed -n '/^\[workspace.package\]/,/^\[/p' Cargo.toml \
+            | sed -n 's/^version = "\(.*\)"/\1/p' | head -n1)
+          spec=$(awk '/^Version:/{print $2; exit}' packaging/fedora/artscii.spec)
+          echo "workspace=$version spec=$spec"
+          if [ -z "$version" ] || [ "$version" != "$spec" ]; then
+            echo "::error::packaging/fedora/artscii.spec Version ($spec) does not match [workspace.package] version ($version)"
+            exit 1
+          fi
+
       # `nix flake check` does not cover Nix formatting, so run the flake's own
       # formatter in check mode. This is deliberately not a flake check: a local
       # `nix flake check` should not spawn a treefmt fan-out on a laptop.

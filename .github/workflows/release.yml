@@ -6,8 +6,33 @@ on:
       - "v*"
 
 jobs:
+  verify:
+    name: Verify tag matches workspace version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare tag with [workspace.package] version
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          version=$(sed -n '/^\[workspace.package\]/,/^\[/p' Cargo.toml \
+            | sed -n 's/^version = "\(.*\)"/\1/p' | head -n1)
+          if [ -z "$version" ]; then
+            echo "::error::could not read the version from [workspace.package]"
+            exit 1
+          fi
+          # v2.1.0-rc.1 must be built from a workspace version of 2.1.0
+          base="${tag%%-*}"
+          echo "tag=$GITHUB_REF_NAME workspace-version=$version (compared: $base)"
+          if [ "$base" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match workspace version $version"
+            exit 1
+          fi
+
   build:
     name: Build ${{ matrix.target }}
+    needs: verify
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
