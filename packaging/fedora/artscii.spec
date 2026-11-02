@@ -9,16 +9,21 @@
 # the Makefile next to this file for COPR's `--method make_srpm` builds.
 
 %global forgeurl https://github.com/4ster-light/artscii
-%global git_tag  v%{version}
+# `prerelease`/`rc` are empty for stable builds. Release candidates are built
+# from a generated copy of this spec that hardcodes them (see the "Build SRPM"
+# step of the release workflow): COPR re-runs `rpmbuild -bs` on the spec found
+# inside the uploaded SRPM, so command-line defines would be lost there.
+%global git_tag      v%{version}%{?prerelease}
+%global archive_name %{name}-%{version}%{?prerelease}
 
 Name:           artscii
 Version:        2.1.0
-Release:        1%{?dist}
+Release:        %{?rc:0.%{rc}}%{!?rc:1}%{?dist}
 Summary:        Convert images and videos to ASCII art
 
 License:        MIT
 URL:            %{forgeurl}
-Source0:        %{forgeurl}/archive/%{git_tag}/%{name}-%{version}.tar.gz
+Source0:        %{forgeurl}/archive/%{git_tag}/%{archive_name}.tar.gz
 
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -37,7 +42,7 @@ Floyd-Steinberg, Atkinson, Riemersma), color and brightness/contrast control,
 and resizing.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{archive_name}
 
 %build
 # Keep the crates.io registry cache inside the build directory so it is not
@@ -61,7 +66,7 @@ install -Dpm0755 target/release/artscii %{buildroot}%{_bindir}/artscii
 %{_bindir}/artscii
 
 %changelog
-* Sun Nov 02 2026 4ster-light <4ster.dev@proton.me> - 2.1.0-1
+* Mon Nov 02 2026 4ster-light <4ster.dev@proton.me> - 2.1.0-1
 - Update to 2.1.0 (audio playback split into an "audio" feature).
 
 * Sat Oct 31 2026 4ster-light <4ster.dev@proton.me> - 2.0.1-1

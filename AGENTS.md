@@ -72,6 +72,16 @@ project is `4ster-light/artscii` (fedora-44/45/rawhide, x86_64 and aarch64).
 Those releases, plus Arch, build and run against their stock ffmpeg (MP4 export
 works via `libopenh264` on Fedora and `libx264` on Arch).
 
+Two projects exist: `4ster-light/artscii` for stable `vX.Y.Z` tags and
+`4ster-light/artscii-testing` for release candidates. The release workflow
+chooses between them from the tag (anything containing `-` goes to testing).
+RCs need a *generated* spec: COPR re-runs `rpmbuild -bs` on the spec inside the
+uploaded SRPM, so `--define` flags are lost. The workflow therefore rewrites
+`%global git_tag`/`%global archive_name` to `v%{version}-rc.N` and sets
+`Release: 0.<N>` (which sorts below the stable `1` and keeps each RC upgradable
+over the previous one). The job needs the `COPR_CONFIG` repository secret
+(contents of `~/.config/copr`).
+
 ## Feature Flags
 
 - `artscii-core` has a `cli` feature (adds `clap`). Enabled transitively by

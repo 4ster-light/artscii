@@ -15,11 +15,14 @@
 # the SRPM (the spec still uses `%{?dist}` for dist-git style builds).
 
 SPEC    := artscii.spec
-NAME    := $(shell rpmspec -q --qf '%{name}\n'    $(SPEC) | head -n1)
+NAME    := $(shell rpmspec -q --qf '%{name}\n' $(SPEC) | head -n1)
 VERSION := $(shell rpmspec -q --qf '%{version}\n' $(SPEC) | head -n1)
-TARBALL := $(NAME)-$(VERSION).tar.gz
-SRCURL  := https://github.com/4ster-light/artscii/archive/v$(VERSION)/$(TARBALL)
 SOURCES := $(CURDIR)/SOURCES
+
+# Take the archive from the spec's Source0, so stable and generated
+# release-candidate specs (v2.1.0 vs v2.1.0-rc.1) always agree.
+SRCURL  := $(shell rpmspec -P $(SPEC) | sed -n 's/^Source0:[[:space:]]*//p' | head -n1)
+TARBALL := $(notdir $(SRCURL))
 
 .PHONY: srpm tarball clean
 

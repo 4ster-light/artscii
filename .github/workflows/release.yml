@@ -200,6 +200,59 @@ jobs:
           files: sums/SHA256SUMS
           prerelease: ${{ contains(github.ref_name, '-') }}
 
+  copr:
+    name: Build RPM in COPR (${{ contains(github.ref_name, '-') && 'artscii-testing' || 'artscii' }})
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rpm make curl python3-pip
+          python3 -m pip install --user --quiet --break-system-packages copr-cli
+
+      - name: Configure copr-cli
+        env:
+          COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+        run: |
+          if [ -z "$COPR_CONFIG" ]; then
+            echo "::error::COPR_CONFIG secret is not set"
+            exit 1
+          fi
+          mkdir -p "$HOME/.config"
+          printf '%s\n' "$COPR_CONFIG" > "$HOME/.config/copr"
+          chmod 600 "$HOME/.config/copr"
+
+      - name: Build SRPM and submit to COPR
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "${tag#*-}" != "$tag" ]; then
+            # Release candidate: the testing project gets a spec that hardcodes
+            # the v2.1.0-rc.1 source tag and a 0.<n> release (so each RC
+            # upgrades the previous one). Baking it into the spec is required
+            # because COPR re-runs rpmbuild -bs on the spec inside the SRPM.
+            project=artscii-testing
+            prerelease="-${tag#*-}"
+            rc="${tag##*.}"
+            sed -i \
+              -e "s|^%global git_tag .*|%global git_tag      v%{version}${prerelease}|" \
+              -e "s|^%global archive_name .*|%global archive_name %{name}-%{version}${prerelease}|" \
+              -e "s|^Release:.*|Release:        0.${rc}%{?dist}|" \
+              packaging/fedora/artscii.spec
+          else
+            project=artscii
+          fi
+          make -C packaging/fedora srpm
+          srpm=$(ls packaging/fedora/*.src.rpm)
+          echo "Submitting $(basename "$srpm") to 4ster-light/$project"
+          copr-cli build "4ster-light/$project" "$srpm" --nowait
+
   container:
     name: Build container image (${{ matrix.arch }})
     needs: build
