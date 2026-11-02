@@ -62,6 +62,7 @@ version bump either.
 | `packaging/fedora/artscii.spec`        | Fedora/COPR spec (COPR project `4ster-light/artscii`) |
 | `packaging/fedora/Makefile`            | Fetches `Source0`, builds the SRPM          |
 | `packaging/container/Containerfile`    | Alpine image with full ffmpeg, pushed to GHCR on tags |
+| `packaging/container/Containerfile.static` | Portable static musl binary (FFmpeg linked in)  |
 
 The spec builds from source with `--locked` (no vendoring, no bundling), so the
 COPR project must keep **"enable internet access during builds"** on: the
@@ -166,12 +167,25 @@ Why one job instead of one job per check:
 
 `.github/workflows/release.yml` is separate and only runs on `v*` tags; it builds
 the CLI natively on Linux/macOS/Windows with `cargo` (not Nix) to produce the
-release archives. Linux publishes two assets per architecture: a standalone
-binary (`artscii-linux-*`) and `artscii-linux-*.tar.gz`, a self-contained bundle
-with the libraries and an `$ORIGIN` rpath that `install.sh` consumes. The
-standalone binary is built on Ubuntu 24.04, so it is hard-linked to that
-distro's ffmpeg 6 sonames and is *not* wired into `cargo binstall` on Linux;
-the bundle is the portable artifact.
+release archives.
+
+The Linux assets are fully static musl binaries, so they run on any
+distribution with nothing installed (and `cargo binstall` can drop them in
+place). The workflow builds a static FFmpeg (in-tree codecs only, `make
+install` into `/tmp/ff-static`, cached by target) and then links it with
+`--features video,static-ffmpeg`; audio playback is deliberately absent because
+cpal would need ALSA. Three settings are load-bearing and easy to lose:
+
+- `CARGO_TARGET_<TRIPLE>_LINKER=musl-gcc`, otherwise rustc links with host gcc
+  and pulls glibc's static libm (`errno` / `_dl_x86_cpu_features` undefined)
+- `BINDGEN_EXTRA_CLANG_ARGS_<triple>=-isystem /usr/include/*-linux-musl`,
+  otherwise bindgen fails on `limits.h`
+- `PKG_CONFIG_ALLOW_CROSS=1` and `PKG_CONFIG_ALL_STATIC=1`
+
+MP4 export falls back to MPEG-4 Part 2 when no H.264 encoder is present (the
+static FFmpeg has none), so `write_mp4` tries `h264` and then `mpeg4`.
+`packaging/container/Containerfile.static` is the local equivalent of that
+build.
 
 The release workflow starts with a `verify` job that fails unless the pushed tag
 matches `[workspace.package]` (`v2.1.0` and `v2.1.0-rc.3` both require

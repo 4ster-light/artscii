@@ -226,12 +226,10 @@ cargo install cargo-binstall
 cargo binstall --git https://github.com/4ster-light/artscii artscii-cli
 ```
 
-> [!WARNING]
-> On **macOS and Windows** this downloads the prebuilt binary. On **Linux** it
-> falls back to compiling from source (needs a Rust toolchain plus ffmpeg, ALSA
-> and clang), because the prebuilt Linux binary is only usable on ffmpeg 6
-> systems; see [Prebuilt binaries](#prebuilt-binaries). Use the
-> [install script](#install-script) if you want the self-contained bundle.
+> [!NOTE]
+> Every platform downloads a prebuilt binary. The Linux assets are static musl
+> builds with ffmpeg linked in, so no toolchain or system libraries are needed;
+> they include everything except terminal audio playback.
 
 ### Install script
 
@@ -247,9 +245,10 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/4ster-light/artscii/main/install.ps1 | iex
 ```
 
-On Linux the script downloads the self-contained tarball, so ffmpeg and ALSA
-travel with the binary; it needs glibc 2.34 or newer (Ubuntu 22.04, Debian 12,
-Fedora 35 and later). On macOS it installs the standalone binary.
+On Linux the script installs the static musl binary: ffmpeg is linked in, so
+it runs on any distribution (glibc, musl, Alpine, NixOS, immutable images) with
+nothing installed and no glibc requirement. On macOS it installs the standalone
+binary.
 
 The script installs into `~/.local/bin`
 (`%LOCALAPPDATA%\Programs\artscii` on Windows). Override the destination with
@@ -261,43 +260,32 @@ release with `ARTSCII_VERSION` (for example `v2.1.0`).
 Download the asset for your platform from the
 [latest release](https://github.com/4ster-light/artscii/releases/latest):
 
-| Platform       | Asset                          | Notes                                     |
-| -------------- | ------------------------------ | ----------------------------------------- |
-| Linux x86_64   | `artscii-linux-x86_64`         | Small; see the note below                 |
-| Linux x86_64   | `artscii-linux-x86_64.tar.gz`  | Self-contained bundle (for `install.sh`)  |
-| Linux ARM64    | `artscii-linux-aarch64`        | Small; see the note below                 |
-| Linux ARM64    | `artscii-linux-aarch64.tar.gz` | Self-contained bundle (for `install.sh`)  |
-| macOS x86_64   | `artscii-macos-x86_64`         |                                           |
-| macOS ARM64    | `artscii-macos-aarch64`        |                                           |
-| Windows x86_64 | `artscii-windows-x86_64.exe`   |                                           |
+| Platform       | Asset                        | Notes                                        |
+| -------------- | ---------------------------- | -------------------------------------------- |
+| Linux x86_64   | `artscii-linux-x86_64`       | Static musl, runs on any Linux, no dependencies |
+| Linux ARM64    | `artscii-linux-aarch64`      | Static musl, runs on any Linux, no dependencies |
+| macOS x86_64   | `artscii-macos-x86_64`       |                                              |
+| macOS ARM64    | `artscii-macos-aarch64`      |                                              |
+| Windows x86_64 | `artscii-windows-x86_64.exe` |                                              |
 
 Each asset ships with a matching `.sha256` checksum, plus an aggregated
 `SHA256SUMS` file. After downloading:
 
 ```bash
-# Linux, self-contained tarball (libraries included, glibc 2.34+)
-tar xzf artscii-linux-x86_64.tar.gz
-./artscii --help
+# Linux (static, no runtime dependencies)
+chmod +x artscii-linux-x86_64
+./artscii-linux-x86_64 --help
 
 # macOS / Windows
 chmod +x artscii-macos-x86_64
 ./artscii-macos-x86_64
 ```
 
-> [!IMPORTANT]
-> The standalone `artscii-linux-*` binaries are built on Ubuntu 24.04 and link
-> that release's ffmpeg generation (`libavcodec.so.60`, `libavutil.so.58`, ...),
-> which makes them Ubuntu 24.04 LTS-only in practice (Mint 22, Pop!_OS 24.04 and
-> similar derivatives included). Debian 13, Fedora, Arch and Ubuntu 25.04+ all
-> ship a different ffmpeg soname and fail with
-> `libavutil.so.58: cannot open shared object file`. Use the tarball, a native
-> package, or build from source there. (glibc is not the limit: the binary only
-> needs 2.34.)
-
 > [!NOTE]
-> Linux tarballs bundle the required ffmpeg/alsa libraries, so no extra
-> packages are needed at runtime. macOS and Windows include video support
-> natively.
+> The Linux binaries are static musl builds: image conversion, video decoding,
+> GIF export and MP4 export (via MPEG-4 Part 2 or H.264 when the build has an
+> encoder) work with nothing installed. Terminal audio playback is only in the
+> native packages, the container and source builds, because it needs ALSA.
 
 ### Cargo
 
