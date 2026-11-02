@@ -16,7 +16,7 @@ resolver = "2"
 # dependencies (`Option::as_chunks` in `artscii-video` needs 1.88); leptos in
 # `artscii-web` happens to require the same version.
 [workspace.package]
-version = "2.0.1"
+version = "2.1.0"
 edition = "2024"
 rust-version = "1.88"
 authors = ["4ster-light"]

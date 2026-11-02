@@ -12,7 +12,7 @@
 %global git_tag  v%{version}
 
 Name:           artscii
-Version:        2.0.1
+Version:        2.1.0
 Release:        1%{?dist}
 Summary:        Convert images and videos to ASCII art
 
@@ -61,5 +61,8 @@ install -Dpm0755 target/release/artscii %{buildroot}%{_bindir}/artscii
 %{_bindir}/artscii
 
 %changelog
+* Sun Nov 02 2026 4ster-light <4ster.dev@proton.me> - 2.1.0-1
+- Update to 2.1.0 (audio playback split into an "audio" feature).
+
 * Sat Oct 31 2026 4ster-light <4ster.dev@proton.me> - 2.0.1-1
 - Initial COPR package.
