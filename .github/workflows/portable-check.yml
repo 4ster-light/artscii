@@ -1,8 +1,9 @@
 name: Portable build check (temporary)
 
-# Temporary workflow used to iterate on the static musl build on the arm64
-# runner without burning a release tag. Runs only when this file changes, or
-# manually. Delete once the aarch64 static build is green.
+# Temporary workflow used to iterate on the static musl build without burning a
+# release tag: it mirrors the Linux jobs of release.yml (static FFmpeg, musl
+# cross build) on both architectures and smoke-tests the artifact.
+# Delete once the aarch64 static build is confirmed green in a release.
 
 on:
   workflow_dispatch:
@@ -14,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  probe:
-    name: Probe static FFmpeg configure flags (${{ matrix.arch }})
+  build:
+    name: Static build (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -23,40 +24,61 @@ jobs:
         include:
           - os: ubuntu-24.04-arm
             arch: arm64
+            target: aarch64-unknown-linux-musl
           - os: ubuntu-latest
             arch: amd64
+            target: x86_64-unknown-linux-musl
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
       - name: Install toolchain
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq musl-tools musl-dev nasm pkg-config
+          sudo apt-get install -y -qq musl-tools musl-dev nasm pkg-config libclang-dev
           echo "arch: $(uname -m)"
           musl-gcc --version | head -n1
+          ls -d /usr/include/*-linux-musl
 
-      - name: Probe configure variants
+      - name: Build static FFmpeg
         run: |
-          set -uo pipefail
+          set -euo pipefail
           git clone --depth=1 -b release/9.0 -q https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg
           cd /tmp/ffmpeg
-          base=(--disable-shared --enable-static --disable-programs --disable-doc
-                --disable-debug --disable-network --disable-autodetect
-                --cc=musl-gcc --extra-cflags="-Os")
-          try() {
-            name="$1"; shift
-            if ./configure "${base[@]}" "$@" >/tmp/cfg-$name.log 2>&1; then
-              echo "VARIANT $name: OK"
-              # keep the tree clean for the next attempt
-              make distclean >/dev/null 2>&1 || true
-              return 0
-            else
-              echo "VARIANT $name: FAILED"
-              grep -iE 'atomics|error' /tmp/cfg-$name.log | tail -n 5
-              make distclean >/dev/null 2>&1 || true
-              return 1
-            fi
-          }
-          try plain || true
-          try latomic --extra-ldflags="-latomic" || true
-          try libatomic --extra-libs="-latomic" || true
-          try noneoutline --extra-cflags="-Os -mno-outline-atomics" || true
-          try combo --extra-cflags="-Os -mno-outline-atomics" --extra-ldflags="-latomic" || true
+          extra_cflags="-Os"
+          case "${{ matrix.target }}" in
+            aarch64-*) extra_cflags="-Os -mno-outline-atomics" ;;
+          esac
+          if ! ./configure \
+              --disable-shared --enable-static \
+              --disable-programs --disable-doc --disable-debug \
+              --disable-network --disable-autodetect \
+              --prefix=/tmp/ff --libdir=/tmp/ff/lib \
+              --cc=musl-gcc --extra-cflags="$extra_cflags" > /tmp/cfg.log 2>&1; then
+            echo "::error::configure failed"; tail -n 40 /tmp/cfg.log; exit 1
+          fi
+          make -j"$(nproc)" > /tmp/make.log 2>&1 || { tail -n 40 /tmp/make.log; exit 1; }
+          make install > /dev/null 2>&1
+
+      - name: Build static binary
+        run: |
+          set -euo pipefail
+          target="${{ matrix.target }}"
+          upper=$(echo "$target" | tr 'a-z-' 'A-Z_')
+          lower=$(echo "$target" | tr '-' '_')
+          musl_inc=$(ls -d /usr/include/*-linux-musl | head -n1)
+          export PKG_CONFIG_PATH=/tmp/ff/lib/pkgconfig
+          export PKG_CONFIG_ALL_STATIC=1 PKG_CONFIG_ALLOW_CROSS=1
+          export "CC_${lower}=musl-gcc"
+          export "CFLAGS_${lower}=-isystem ${musl_inc}"
+          export "BINDGEN_EXTRA_CLANG_ARGS_${lower}=-isystem ${musl_inc}"
+          export "CARGO_TARGET_${upper}_LINKER=musl-gcc"
+          cargo build --release --locked --target "$target" \
+            --no-default-features --features video,static-ffmpeg
+          strip "target/${target}/release/artscii"
+          file "target/${target}/release/artscii"
+          ldd "target/${target}/release/artscii" 2>&1 | head -2 || true
+          "target/${target}/release/artscii" --version

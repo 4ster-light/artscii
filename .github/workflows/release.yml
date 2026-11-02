@@ -97,12 +97,19 @@ jobs:
           git clone --depth=1 -b release/9.0 -q https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg-src
           cd /tmp/ffmpeg-src
           # In-tree codecs only (no autodetected zlib/bz2/xcb), static, for musl.
+          # On aarch64, GCC defaults to outline atomics, which need libatomic
+          # that musl-gcc does not link; FFmpeg's atomics probe then fails with
+          # "Threading is enabled, but no atomics are available".
+          extra_cflags="-Os"
+          case "${{ matrix.target }}" in
+            aarch64-*) extra_cflags="-Os -mno-outline-atomics" ;;
+          esac
           if ! ./configure \
               --disable-shared --enable-static \
               --disable-programs --disable-doc --disable-debug \
               --disable-network --disable-autodetect \
               --prefix=/tmp/ff-static --libdir=/tmp/ff-static/lib \
-              --cc=musl-gcc --extra-cflags="-Os" > /tmp/ff-configure.log 2>&1; then
+              --cc=musl-gcc --extra-cflags="$extra_cflags" > /tmp/ff-configure.log 2>&1; then
             echo "::error::ffmpeg configure failed"
             tail -n 60 /tmp/ff-configure.log
             exit 1
