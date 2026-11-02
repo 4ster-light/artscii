@@ -1,5 +1,6 @@
 #!/bin/sh
-# ArtSCII installer for Linux and macOS.
+# ArtSCII installer for Linux and macOS. On Linux this installs the static musl
+# binary, which runs on any distribution with no runtime dependencies.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/4ster-light/artscii/main/install.sh | sh
@@ -21,8 +22,8 @@ arch="$(uname -m)"
 case "$os" in
   Linux)
     case "$arch" in
-      x86_64 | amd64) asset="artscii-linux-x86_64.tar.gz" ;;
-      aarch64 | arm64) asset="artscii-linux-aarch64.tar.gz" ;;
+      x86_64 | amd64) asset="artscii-linux-x86_64" ;;
+      aarch64 | arm64) asset="artscii-linux-aarch64" ;;
       *)
         echo "artscii: unsupported Linux architecture: $arch" >&2
         exit 1
@@ -89,16 +90,7 @@ fi
 
 mkdir -p "$INSTALL_DIR"
 
-case "$asset" in
-  *.tar.gz)
-    # The Linux tarball bundles its runtime libraries next to the binary and
-    # relies on an $ORIGIN rpath, so install the whole bundle together.
-    tar -xzf "$tmp/$asset" -C "$INSTALL_DIR"
-    ;;
-  *)
-    cp "$tmp/$asset" "$INSTALL_DIR/$BIN"
-    ;;
-esac
+cp "$tmp/$asset" "$INSTALL_DIR/$BIN"
 
 chmod 755 "$INSTALL_DIR/$BIN"
 

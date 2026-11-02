@@ -31,7 +31,7 @@ jobs:
           fi
 
   build:
-    name: Build ${{ matrix.target }}
+    name: Build ${{ matrix.asset }}
     needs: verify
     runs-on: ${{ matrix.os }}
     permissions:
@@ -40,44 +40,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Portable Linux binaries: fully static musl, built against a static
+          # FFmpeg so they run on any distro with nothing installed.
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
             asset: artscii-linux-x86_64
-
+            static: true
           - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
+            target: aarch64-unknown-linux-musl
             asset: artscii-linux-aarch64
-
+            static: true
           - os: macos-latest
             target: aarch64-apple-darwin
             asset: artscii-macos-aarch64
-
           - os: macos-15-intel
             target: x86_64-apple-darwin
             asset: artscii-macos-x86_64
-
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             asset: artscii-windows-x86_64
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Resolve asset names
-        shell: bash
-        run: |
-          ext=""
-          [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
-          echo "PLAIN_ASSET=${{ matrix.asset }}${ext}" >> "$GITHUB_ENV"
-
-          # Linux publishes two assets per architecture: a standalone binary
-          # (`artscii-linux-*`, dynamically linked against the distro's
-          # ffmpeg/alsa, used by cargo-binstall) and a self-contained bundle
-          # (`artscii-linux-*.tar.gz`, libraries plus `$ORIGIN` rpath, used by
-          # install.sh).
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            echo "BUNDLE_ASSET=${{ matrix.asset }}.tar.gz" >> "$GITHUB_ENV"
-          fi
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -87,22 +71,33 @@ jobs:
         with:
           key: ${{ matrix.target }}
 
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Install system dependencies (Linux static build)
+        if: matrix.static
         run: |
-          sudo apt update
-          sudo apt install -y patchelf \
-            libavcodec-dev \
-            libavformat-dev \
-            libavutil-dev \
-            libavfilter-dev \
-            libavdevice-dev \
-            libswscale-dev \
-            libswresample-dev \
-            libasound2-dev
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq musl-tools libclang-dev pkg-config nasm
+
+      - name: Restore static FFmpeg
+        if: matrix.static
+        id: ffmpeg-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/ff-static
+          key: ffmpeg-static-${{ matrix.target }}-release-9.0-v1
+
+      - name: Build static FFmpeg
+        if: matrix.static && steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          git clone --depth=1 -b release/9.0 -q https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg-src
+          cd /tmp/ffmpeg-src
+          # In-tree codecs only (no autodetected zlib/bz2/xcb), static, for musl.
+          ./configure             --disable-shared --enable-static             --disable-programs --disable-doc --disable-debug             --disable-network --disable-autodetect             --prefix=/tmp/ff-static --libdir=/tmp/ff-static/lib             --cc=musl-gcc --extra-cflags="-Os" >/dev/null
+          make -j"$(nproc)" >/dev/null
+          make install >/dev/null
 
       - name: Install system dependencies (macOS aarch64)
-        if: runner.os == 'macOS' && matrix.target == 'aarch64-apple-darwin'
+        if: matrix.target == 'aarch64-apple-darwin'
         run: |
           brew install ffmpeg
           prefix=$(brew --prefix ffmpeg)
@@ -110,7 +105,7 @@ jobs:
           echo "FFMPEG_INCLUDE_DIR=${prefix}/include" >> $GITHUB_ENV
 
       - name: Install system dependencies (macOS x86_64)
-        if: runner.os == 'macOS' && matrix.target == 'x86_64-apple-darwin'
+        if: matrix.target == 'x86_64-apple-darwin'
         run: |
           softwareupdate --install-rosetta --agree-to-license 2>/dev/null || true
           if ! arch -x86_64 /usr/local/bin/brew --version &>/dev/null; then
@@ -136,69 +131,57 @@ jobs:
           "FFMPEG_DIR=$($devDir.FullName)" >> $env:GITHUB_ENV
           "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
 
-      - name: Build
+      - name: Build (static musl)
+        if: matrix.static
+        run: |
+          set -euo pipefail
+          target="${{ matrix.target }}"
+          upper=$(echo "$target" | tr 'a-z-' 'A-Z_')
+          lower=$(echo "$target" | tr '-' '_')
+          musl_inc=$(ls -d /usr/include/*-linux-musl | head -n1)
+          export PKG_CONFIG_PATH=/tmp/ff-static/lib/pkgconfig
+          export PKG_CONFIG_ALL_STATIC=1
+          export PKG_CONFIG_ALLOW_CROSS=1
+          export "CC_${lower}=musl-gcc"
+          export "CFLAGS_${lower}=-isystem ${musl_inc}"
+          export "BINDGEN_EXTRA_CLANG_ARGS_${lower}=-isystem ${musl_inc}"
+          export "CARGO_TARGET_${upper}_LINKER=musl-gcc"
+          cargo build --release --locked --target "$target" \
+            --no-default-features --features video,static-ffmpeg
+
+      - name: Build (system ffmpeg)
+        if: ${{ !matrix.static }}
         run: cargo build --release --locked -p artscii-cli --features video,audio --target ${{ matrix.target }}
         shell: bash
 
       - name: Strip binary (Unix)
         if: runner.os != 'Windows'
-        run: strip target/${{ matrix.target }}/release/artscii
+        run: strip "target/${{ matrix.target }}/release/artscii"
 
       - name: Stage standalone binary
         shell: bash
         run: |
           ext=""
           [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
-          cp "target/${{ matrix.target }}/release/artscii${ext}" "$PLAIN_ASSET"
+          cp "target/${{ matrix.target }}/release/artscii${ext}" "${{ matrix.asset }}${ext}"
 
-      - name: Bundle runtime libraries (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          set -e
-          exe="target/${{ matrix.target }}/release/artscii"
-          mkdir -p dist
-          cp "$exe" dist/artscii
-
-          SYS_LIBS='linux-vdso|ld-linux|libc\.so|libm\.so|libpthread|libdl\.so|librt\.so|libgcc_s|libstdc\+\+|libresolv|libnss_|libselinux|libpcre'
-
-          bundle_libs() {
-            for lib in $(ldd "$1" 2>/dev/null | awk '/=> \// {print $3}'); do
-              local name=$(basename "$lib")
-              if echo "$name" | grep -qE "$SYS_LIBS"; then continue; fi
-              if [ -f "dist/$name" ]; then continue; fi
-              cp "$lib" "dist/"
-              bundle_libs "dist/$name"
-            done
-          }
-
-          bundle_libs dist/artscii
-          patchelf --set-rpath '$ORIGIN' dist/artscii
-          for so in dist/*.so*; do
-            patchelf --set-rpath '$ORIGIN' "$so" 2>/dev/null || true
-          done
-          tar czf "$BUNDLE_ASSET" -C dist .
-
-      - name: Generate checksums
+      - name: Generate checksum
         shell: bash
         run: |
-          for asset in "$PLAIN_ASSET" ${BUNDLE_ASSET:+"$BUNDLE_ASSET"}; do
-            [ -f "$asset" ] || continue
-            if command -v sha256sum >/dev/null 2>&1; then
-              sha256sum "$asset" > "$asset.sha256"
-            else
-              shasum -a 256 "$asset" > "$asset.sha256"
-            fi
-          done
+          asset="${{ matrix.asset }}"
+          [ "$RUNNER_OS" = "Windows" ] && asset="${asset}.exe"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$asset" > "$asset.sha256"
+          else
+            shasum -a 256 "$asset" > "$asset.sha256"
+          fi
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          # Plain binary (and its checksum), plus the Linux bundle when there
-          # is one. Anything else in the workspace root does not start with
-          # `artscii-`.
           files: |
             ./artscii-*
-          # Tags with a pre-release suffix (for example v2.0.1-rc.1) must not
+          # Tags with a pre-release suffix (for example v2.1.0-rc.1) must not
           # be published as the latest release.
           prerelease: ${{ contains(github.ref_name, '-') }}
 

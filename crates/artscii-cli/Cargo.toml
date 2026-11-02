@@ -31,15 +31,20 @@ name = "artscii"
 path = "src/main.rs"
 
 # Prebuilt binaries are published to GitHub Releases with non-standard names.
-# These overrides let `cargo binstall` fetch them on macOS and Windows. On Linux
-# there is deliberately no override: the standalone `artscii-linux-*` binary is
-# built on Ubuntu 24.04 and therefore hard-links that distro's ffmpeg sonames
-# (libavcodec.so.60, ...), so it only runs on ffmpeg 6 systems. binstall cannot
-# check libraries before installing, and a source build links the local ffmpeg,
-# which is correct everywhere; the self-contained `artscii-linux-*.tar.gz`
-# bundle is not usable either because binstall extracts only the binary.
+# The Linux assets are static musl builds with ffmpeg linked in, so they run on
+# any distribution and are safe for binstall to drop into place.
 [package.metadata.binstall]
 disabled-strategies = ["quick-install"]
+
+[package.metadata.binstall.overrides.x86_64-unknown-linux-gnu]
+pkg-url = "{ repo }/releases/download/v{ version }/artscii-linux-x86_64"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "bin"
+
+[package.metadata.binstall.overrides.aarch64-unknown-linux-gnu]
+pkg-url = "{ repo }/releases/download/v{ version }/artscii-linux-aarch64"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "bin"
 
 [package.metadata.binstall.overrides.aarch64-apple-darwin]
 pkg-url = "{ repo }/releases/download/v{ version }/artscii-macos-aarch64"

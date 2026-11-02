@@ -1,0 +1,65 @@
+# Portable Linux binary: static musl with FFmpeg linked in.
+#
+# Produces the same artifact the release workflow ships for Linux: one ELF that
+# runs on any distribution (glibc, musl, Alpine, NixOS, immutable images) with
+# nothing installed.
+#
+#   podman build -f packaging/container/Containerfile.static \
+#     --output type=local,dest=out .
+#   ./out/artscii --version
+#
+# Why an Ubuntu builder: rustup's toolchain is dynamically linked against glibc,
+# which bindgen requires (it dlopens libclang, which a static musl toolchain
+# cannot do). The output still targets musl, cross-compiled with musl-gcc. The
+# Alpine-based image build (Containerfile) is a different thing: it produces a
+# full-featured image, not a portable binary.
+#
+# Audio playback is left out on purpose: cpal would drag in ALSA, which does not
+# link statically in a useful way. Native packages and the container keep audio.
+FROM ubuntu:24.04 AS build
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq \
+ && apt-get install -y -qq --no-install-recommends \
+      build-essential nasm pkg-config git curl ca-certificates \
+      musl-tools libclang-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable
+ENV PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Static FFmpeg for musl, in-tree codecs only (no autodetected zlib/bz2/xcb).
+RUN git clone --depth=1 -b release/9.0 https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg \
+ && cd /tmp/ffmpeg \
+ && ./configure \
+      --disable-shared --enable-static \
+      --disable-programs --disable-doc --disable-debug \
+      --disable-network --disable-autodetect \
+      --prefix=/opt/ff --libdir=/opt/ff/lib \
+      --cc=musl-gcc --extra-cflags="-Os" \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /tmp/ffmpeg
+
+WORKDIR /src
+COPY . .
+
+ARG TARGET=x86_64-unknown-linux-musl
+RUN set -e; \
+    rustup target add "$TARGET"; \
+    upper=$(echo "$TARGET" | tr 'a-z-' 'A-Z_'); \
+    lower=$(echo "$TARGET" | tr '-' '_'); \
+    musl_inc=$(ls -d /usr/include/*-linux-musl | head -n1); \
+    export PKG_CONFIG_PATH=/opt/ff/lib/pkgconfig; \
+    export PKG_CONFIG_ALL_STATIC=1; \
+    export PKG_CONFIG_ALLOW_CROSS=1; \
+    export "CC_${lower}=musl-gcc"; \
+    export "CFLAGS_${lower}=-isystem ${musl_inc}"; \
+    export "BINDGEN_EXTRA_CLANG_ARGS_${lower}=-isystem ${musl_inc}"; \
+    export "CARGO_TARGET_${upper}_LINKER=musl-gcc"; \
+    cargo build --release --locked --target "$TARGET" \
+      --no-default-features --features video,static-ffmpeg; \
+    strip "target/${TARGET}/release/artscii"; \
+    cp "target/${TARGET}/release/artscii" /src/artscii-static
+
+FROM scratch AS artifact
+COPY --from=build /src/artscii-static /artscii
