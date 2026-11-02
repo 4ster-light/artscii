@@ -97,9 +97,22 @@ jobs:
           git clone --depth=1 -b release/9.0 -q https://github.com/FFmpeg/FFmpeg /tmp/ffmpeg-src
           cd /tmp/ffmpeg-src
           # In-tree codecs only (no autodetected zlib/bz2/xcb), static, for musl.
-          ./configure             --disable-shared --enable-static             --disable-programs --disable-doc --disable-debug             --disable-network --disable-autodetect             --prefix=/tmp/ff-static --libdir=/tmp/ff-static/lib             --cc=musl-gcc --extra-cflags="-Os" >/dev/null
-          make -j"$(nproc)" >/dev/null
-          make install >/dev/null
+          if ! ./configure \
+              --disable-shared --enable-static \
+              --disable-programs --disable-doc --disable-debug \
+              --disable-network --disable-autodetect \
+              --prefix=/tmp/ff-static --libdir=/tmp/ff-static/lib \
+              --cc=musl-gcc --extra-cflags="-Os" > /tmp/ff-configure.log 2>&1; then
+            echo "::error::ffmpeg configure failed"
+            tail -n 60 /tmp/ff-configure.log
+            exit 1
+          fi
+          if ! make -j"$(nproc)" > /tmp/ff-make.log 2>&1; then
+            echo "::error::ffmpeg build failed"
+            tail -n 80 /tmp/ff-make.log
+            exit 1
+          fi
+          make install > /tmp/ff-install.log 2>&1 || { tail -n 30 /tmp/ff-install.log; exit 1; }
 
       - name: Install system dependencies (macOS aarch64)
         if: matrix.target == 'aarch64-apple-darwin'
