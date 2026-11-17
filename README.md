@@ -7,6 +7,7 @@
 [![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-teal?style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
 [![Nix flake](https://img.shields.io/badge/Nix-flake-5277C3?logo=nixos&logoColor=white&style=flat-square)](flake.nix)
 [![COPR](https://img.shields.io/badge/Fedora-COPR-3c6eb4?logo=fedora&logoColor=white&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii)
+[![ghcr](https://img.shields.io/badge/ghcr.io-4ster--light%2Fartscii-2496ED?logo=docker&logoColor=white&style=flat-square)](https://github.com/4ster-light/artscii/pkgs/container/artscii)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/4ster-light/artscii/ci.yml?branch=main&event=push&style=flat-square)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
 [![COPR](https://img.shields.io/copr/build/4ster-light/artscii/artscii?label=COPR&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii/builds/)
