@@ -172,7 +172,7 @@ version = "2.1.0"
 dependencies = [
  "artscii-core",
  "colored",
- "html-escape",
+ "html-escape 0.3.1",
  "image",
  "thiserror 2.0.17",
 ]
@@ -1196,12 +1196,15 @@ checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
 
 [[package]]
 name = "html-escape"
-version = "0.2.13"
+version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d1ad449764d627e22bfd7cd5e8868264fc9236e07c752972b4080cd351cb476"
-dependencies = [
- "utf8-width",
-]
+checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
+
+[[package]]
+name = "html-escape"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d45ed4d99334da2a2f221504e8ffc8ad09baf2a452b154465a976bfde697b004"
 
 [[package]]
 name = "http"
@@ -1599,7 +1602,7 @@ dependencies = [
  "cfg-if",
  "convert_case 0.11.0",
  "convert_case_extras",
- "html-escape",
+ "html-escape 0.2.15",
  "itertools",
  "leptos_hot_reload",
  "prettyplease",
@@ -2753,7 +2756,7 @@ dependencies = [
  "either_of",
  "erased",
  "futures",
- "html-escape",
+ "html-escape 0.2.15",
  "indexmap",
  "itertools",
  "js-sys",
@@ -2943,12 +2946,6 @@ dependencies = [
  "percent-encoding",
  "serde",
 ]
-
-[[package]]
-name = "utf8-width"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1292c0d970b54115d14f2492fe0170adf21d68a1de108eebc51c1df4f346a091"
 
 [[package]]
 name = "utf8_iter"
