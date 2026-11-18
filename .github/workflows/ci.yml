@@ -54,6 +54,24 @@ jobs:
             echo "::error::packaging/fedora/artscii.spec Version ($spec) does not match [workspace.package] version ($version)"
             exit 1
           fi
+      # Trunk's wasm-bindgen-cli is derived from the exact wasm-bindgen pin
+      # in the web manifest (nix/crane.nix), so that pin must stay an exact
+      # =X.Y.Z requirement and no hand-synced nixpkgs attribute may return.
+      - name: Check wasm-bindgen tooling matches the web manifest
+        run: |
+          set -euo pipefail
+          pin=$(sed -n 's/^wasm-bindgen *= *"=\([0-9.]*\)"$/\1/p' crates/artscii-web/Cargo.toml | head -n1)
+          if [ -z "$pin" ]; then
+            echo "::error::crates/artscii-web/Cargo.toml must pin wasm-bindgen exactly (=X.Y.Z); the Nix side derives wasm-bindgen-cli from it"
+            exit 1
+          fi
+          want="wasm-bindgen-cli_$(echo "$pin" | tr . _)"
+          bad=$(grep -rhoE 'wasm-bindgen-cli_[0-9]+(_[0-9]+)+' nix/ | sort -u | grep -vxF "$want" || true)
+          if [ -n "$bad" ]; then
+            echo "::error::hardcoded attribute $bad in nix/ does not match wasm-bindgen =$pin in crates/artscii-web/Cargo.toml"
+            exit 1
+          fi
+          echo "wasm-bindgen=$pin tooling=$want"
 
       # `nix flake check` does not cover Nix formatting, so run the flake's own
       # formatter in check mode. This is deliberately not a flake check: a local

@@ -193,6 +193,32 @@ matches `[workspace.package]` (`v2.1.0` and `v2.1.0-rc.3` both require
 binary builds, the GHCR image (amd64 + arm64 + manifest), and the COPR SRPM
 submission described under Packaging.
 
+## Dependency Updates
+
+Dependabot is configured in `.github/dependabot.yml` and activates from
+`main`: cargo (weekly, grouped minor/patch), the Nix flake inputs (monthly,
+one grouped PR), and GitHub Actions tags (monthly). Security updates bypass
+those schedules but still run the required `nix flake check`.
+
+- The `wasm-bindgen-cli` used by `checks.web-build` and the dev shell is
+  derived from the exact `wasm-bindgen = "=X.Y.Z"` pin in
+  `crates/artscii-web/Cargo.toml` (`nix/crane.nix` builds the nixpkgs
+  attribute name from it). Keep that pin exact; the CI step
+  "Check wasm-bindgen tooling matches the web manifest" rejects both a loose
+  pin and any hardcoded `wasm-bindgen-cli_*` attribute. When a bump PR fails
+  because the pinned nixpkgs lacks the matching attribute, roll the
+  `nixpkgs` input first (the monthly nix update PR) or close the crate bump.
+- Dependency updates must build with the declared `rust-version` (1.88).
+  CI compiles with rolling stable, so check a PR that raises a dependency's
+  MSRV before merging: either close it or bump `rust-version` deliberately,
+  since the COPR builds use their stock, older rustc.
+- Dependabot never bumps the project's own version. The
+  `[workspace.package]` <-> `artscii.spec` <-> tag lockstep stays manual (see
+  Development Workflow).
+- `release.yml` action tags and the `packaging/container/` images are
+  release-time-only surfaces: their Dependabot PRs have no PR-time
+  validation, review them by hand.
+
 ## Development Workflow
 
 - `main` is protected: the `nix flake check` status check is required, history
