@@ -14,7 +14,7 @@ categories = ["multimedia::video"]
 artscii-core = { path = "../artscii-core" }
 artscii-img = { path = "../artscii-img" }
 anyhow = "1.0.100"
-cpal = { version = "0.17.3", optional = true }
+cpal = { version = "0.18.2", optional = true }
 # Only the parts of ffmpeg we use: this keeps libavfilter/libavdevice (and with
 # them ALSA on Linux) out of the dependency graph.
 ffmpeg-next = { version = "9.0.0", default-features = false, features = [
