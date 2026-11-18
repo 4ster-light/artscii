@@ -1,0 +1,48 @@
+# Dependabot version updates: the Rust workspace, the Nix flake inputs, and
+# the GitHub Actions tags. Active from the default branch only. Every PR it
+# opens runs the required `nix flake check` job, so nothing broken can merge
+# silently. Dependabot never touches the project's own version; the
+# [workspace.package] <-> spec <-> tag lockstep stays manual.
+version: 2
+updates:
+  # Covers the whole workspace from the virtual root manifest (members under
+  # crates/). Minor and patch bumps arrive as one grouped PR per week; major
+  # bumps get individual PRs for review.
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # flake.lock: nixpkgs (nixos-26.05 point releases), crane, rust-overlay,
+  # flake-parts, as one grouped PR per month.
+  - package-ecosystem: "nix"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(nix)"
+    groups:
+      flake-inputs:
+        patterns:
+          - "*"
+
+  # Workflow action tags. release.yml is only exercised at release time, so
+  # review those bumps before merging.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      actions:
+        patterns:
+          - "*"
