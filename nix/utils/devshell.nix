@@ -17,7 +17,7 @@
           system
           ;
       };
-      inherit (crane) artscii;
+      inherit (crane) artscii wasmBindgenCli;
     in
     {
       devShells.default = crane.craneLib.devShell {
@@ -25,7 +25,7 @@
         inputsFrom = [ artscii ];
         packages = with pkgs; [
           trunk
-          wasm-bindgen-cli_0_2_126
+          wasmBindgenCli
           lld
           cargo-binstall
           wrangler

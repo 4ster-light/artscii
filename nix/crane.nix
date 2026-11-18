@@ -26,6 +26,13 @@ let
   webCargoToml = lib.importTOML (root + "/crates/artscii-web/Cargo.toml");
   cliPackage = cargoToml.package;
   webPackage = webCargoToml.package;
+  # Trunk's wasm-bindgen-cli must version-match the wasm-bindgen crate pin
+  # in the web manifest, so derive the nixpkgs attribute from that pin
+  # rather than hand-syncing a versioned attribute. A missing attribute
+  # means the pinned nixpkgs is behind: roll the nixpkgs input first or
+  # hold the crate bump.
+  wasmBindgenVersion = lib.removePrefix "=" webCargoToml.dependencies."wasm-bindgen";
+  wasmBindgenCli = pkgs."wasm-bindgen-cli_${lib.replaceStrings [ "." ] [ "_" ] wasmBindgenVersion}";
 
   # The CLI crate builds a binary named `${binName}`, not the package name.
   binName = (builtins.head cargoToml.bin).name;
@@ -135,7 +142,7 @@ let
       src = webSource;
       cargoArtifacts = webCargoArtifacts;
       CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
-      wasm-bindgen-cli = pkgs.wasm-bindgen-cli_0_2_126;
+      wasm-bindgen-cli = wasmBindgenCli;
 
       # The workspace root is a virtual manifest with no root package, so
       # Trunk has to be invoked from inside the web crate.
@@ -164,6 +171,7 @@ in
     commonArgs
     craneLib
     version
+    wasmBindgenCli
     webCargoArtifacts
     webPackage
     webSource
