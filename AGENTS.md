@@ -152,8 +152,11 @@ The `checks` output is what CI runs:
 
 ## Continuous Integration
 
-`.github/workflows/ci.yml` runs on pushes to `main`, every pull request, and
-manual dispatch. It is a single `ubuntu-latest` job that installs Nix, restores
+`.github/workflows/ci.yml` runs on pull requests and merge queue entries, plus
+manual dispatch. It intentionally does not run on direct pushes to `main`,
+so merging a validated PR does not duplicate the gate; if you do push
+directly, run `nix flake check` locally first. It is a single `ubuntu-latest`
+job that installs Nix, restores
 the Nix store from the GitHub Actions cache, checks that the spec version
 matches `[workspace.package]`, runs `nix flake check --keep-going`, and then
 checks Nix formatting with `nix fmt -- --ci`. The flake check executes exactly
@@ -223,11 +226,19 @@ those schedules but still run the required `nix flake check`.
 
 - `main` is protected: the `nix flake check` status check is required, history
   is linear (squash merges only), force pushes and deletions are blocked, and
-  the head branch is deleted on merge. Admins are exempt, so direct pushes are
-  possible, but treat `nix flake check` as mandatory before pushing anything.
-- Work on short-lived branches (`feat/`, `fix/`, `packaging/`, `chore/`) and
-  squash-merge them. Do not create per-crate branches: one `Cargo.lock`, one
-  `[workspace.package]` version, one flake.
+  the head branch is deleted on merge. Admins are exempt from the protection,
+  but treat `nix flake check` as mandatory before pushing anything.
+- Never commit directly to `main` except for minor, inconsequential changes;
+  a pull request is the default for everything else, including small fixes.
+- Name branches `<label>/<title>` with a conventional-commit label and a short
+  kebab-case title, for example `feat/dithering-presets`, `fix/gif-loop`,
+  `docs/branch-workflow` or `chore/nix-update`. Common labels are `feat`,
+  `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, `chore`, `style`,
+  `revert` and `packaging`; Dependabot branches keep their generated names.
+  Do not create per-crate branches: one `Cargo.lock`, one `[workspace.package]`
+  version, one flake.
+- Open pull requests against `main` with a conventional-commit title; the
+  squash merge takes the title as the commit message.
 - `release/<major>.<minor>` is created only when RC fixes need to be isolated
   from `main`, or when a released version needs a hotfix. Tag RCs from `main`
   otherwise, and merge the release branch back after the final tag.

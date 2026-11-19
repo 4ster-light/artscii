@@ -56,13 +56,29 @@ flowchart TD
 
 ### Branches
 
+`main` is the integration branch: work on a topic branch and open a pull
+request instead of pushing directly. Direct pushes to `main` are acceptable
+for minor, inconsequential changes, but that should not become the norm.
+
+Name branches `<label>/<title>` using the same labels as conventional commits,
+with a short kebab-case title:
+
+- `feat/dithering-presets`
+- `fix/gif-loop`
+- `docs/branch-workflow`
+- `chore/nix-update`
+
+Common labels are `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`,
+`ci`, `chore`, `style`, `revert` and `packaging`. Dependabot branches keep
+their generated names.
+
 | Branch                | Purpose                                                    | Lifetime            |
 | --------------------- | ---------------------------------------------------------- | ------------------- |
 | `main`                | Always releasable. Everything merges here.                 | forever             |
-| `feat/<slug>`         | New behaviour                                              | hours to days       |
-| `fix/<slug>`          | Bug fixes                                                  | hours to days       |
-| `packaging/<slug>`    | Spec, Containerfile, workflows, `install.sh`               | hours to days       |
-| `chore/<slug>`        | Lockfile, toolchain, docs, tooling                         | hours to days       |
+| `feat/<title>`        | New behaviour                                              | hours to days       |
+| `fix/<title>`         | Bug fixes                                                  | hours to days       |
+| `packaging/<title>`   | Spec, Containerfile, workflows, `install.sh`               | hours to days       |
+| `chore/<title>`       | Lockfile, toolchain, docs, tooling                         | hours to days       |
 | `release/<major>.<minor>` | Stabilisation of one minor (RC fixes, hotfixes)        | RC.1 until X.Y.0 ships |
 
 - Branch from `main`, keep the branch short, delete it after merging.
@@ -81,6 +97,9 @@ useful.
 
 ### Pull requests
 
+Open pull requests against `main` with a conventional-commit title; the squash
+merge takes the title as the commit message.
+
 `main` is protected:
 
 - the `nix flake check` status check must pass
@@ -91,6 +110,11 @@ useful.
   but anything non-trivial should go through a PR so the diff and the CI result
   are on record
 - `strict` mode is off: you do not have to rebase onto `main` before merging
+
+CI runs on pull requests and merge queue entries (plus manual dispatch); it
+intentionally does not run on every push to `main`, so merging a validated PR
+does not duplicate the gate. If you do push directly to `main`, run
+`nix flake check` locally first.
 
 ### What CI enforces
 
