@@ -10,7 +10,7 @@ jobs:
     name: Verify tag matches workspace version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Compare tag with [workspace.package] version
         run: |
@@ -61,7 +61,7 @@ jobs:
             asset: artscii-windows-x86_64
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -85,7 +85,7 @@ jobs:
       - name: Restore static FFmpeg
         if: matrix.static
         id: ffmpeg-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /tmp/ff-static
           key: ffmpeg-static-${{ matrix.target }}-release-9.0-v1
@@ -202,7 +202,7 @@ jobs:
           fi
 
       - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             ./artscii-*
@@ -228,7 +228,7 @@ jobs:
           cat ./*.sha256 > SHA256SUMS
 
       - name: Upload SHA256SUMS
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: sums/SHA256SUMS
           prerelease: ${{ contains(github.ref_name, '-') }}
@@ -240,7 +240,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install tooling
         run: |
@@ -302,7 +302,7 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build image
         run: |
