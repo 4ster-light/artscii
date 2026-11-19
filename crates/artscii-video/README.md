@@ -57,4 +57,4 @@ Video support requires `ffmpeg` development libraries and `clang` for bindgen:
 
 ## License
 
-MIT
+GPL-3.0-or-later

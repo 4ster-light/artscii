@@ -103,4 +103,4 @@ plain text, and dimensions are each their own derived `Memo`.
 
 ## License
 
-MIT
+GPL-3.0-or-later

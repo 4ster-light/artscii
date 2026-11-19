@@ -20,5 +20,5 @@ version = "2.1.0"
 edition = "2024"
 rust-version = "1.88"
 authors = ["4ster-light"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 repository = "https://github.com/4ster-light/artscii"

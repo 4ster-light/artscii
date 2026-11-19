@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # COPR/Fedora spec for the ArtSCII CLI.
 #
@@ -21,7 +21,7 @@ Version:        2.1.0
 Release:        %{?rc:0.%{rc}}%{!?rc:1}%{?dist}
 Summary:        Convert images and videos to ASCII art
 
-License:        MIT
+License:        GPL-3.0-or-later
 URL:            %{forgeurl}
 Source0:        %{forgeurl}/archive/%{git_tag}/%{archive_name}.tar.gz
 

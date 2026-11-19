@@ -43,7 +43,7 @@ let
   cliMeta = {
     description = cliPackage.description;
     homepage = repository;
-    license = lib.licenses.mit;
+    license = lib.licenses.gpl3Plus;
     mainProgram = binName;
     platforms = lib.platforms.unix;
   };
@@ -51,7 +51,7 @@ let
   webMeta = {
     description = webPackage.description;
     homepage = repository;
-    license = lib.licenses.mit;
+    license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix;
   };
 

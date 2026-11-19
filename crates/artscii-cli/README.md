@@ -53,4 +53,4 @@ cargo install --locked --no-default-features \
 
 ## License
 
-MIT
+GPL-3.0-or-later
