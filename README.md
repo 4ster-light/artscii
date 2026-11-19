@@ -1,23 +1,21 @@
-<div align="center">
-
 # ✰ArtSCII✰
 
-[![Release](https://img.shields.io/github/v/release/4ster-light/artscii?sort=semver&label=release&color=2f6f4e&style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
-[![Website](https://img.shields.io/badge/website-artscii.pages.dev-1f7a5a?logo=cloudflare&logoColor=white&style=flat-square)](https://artscii.pages.dev)
-[![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-teal?style=flat-square)](https://github.com/4ster-light/artscii/releases/latest)
+[![Release](https://img.shields.io/github/v/release/4ster-light/artscii?sort=semver&label=release&color=2f6f4e&style=flat-square&logo=github)](https://github.com/4ster-light/artscii/releases/latest)
+[![Website](https://img.shields.io/badge/website-artscii.pages.dev-1f7a5a?logo=cloudflare&logoColor=white&style=flat-square&color=f48120)](https://artscii.pages.dev)
 [![Nix flake](https://img.shields.io/badge/Nix-flake-5277C3?logo=nixos&logoColor=white&style=flat-square)](flake.nix)
 [![COPR](https://img.shields.io/badge/Fedora-COPR-3c6eb4?logo=fedora&logoColor=white&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii)
 [![ghcr](https://img.shields.io/badge/ghcr.io-4ster--light%2Fartscii-2496ED?logo=docker&logoColor=white&style=flat-square)](https://github.com/4ster-light/artscii/pkgs/container/artscii)
+[![Linux](https://img.shields.io/badge/platform-Linux-teal?style=flat-square&logo=linux&logoColor=white)](#installation)
+[![macOS](https://img.shields.io/badge/platform-macOS-teal?style=flat-square&logo=apple&logoColor=white)](#installation)
+[![Windows](https://img.shields.io/badge/platform-Windows-teal?style=flat-square)](#installation)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/4ster-light/artscii/ci.yml?branch=main&event=push&style=flat-square)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
-[![COPR](https://img.shields.io/copr/build/4ster-light/artscii/artscii?label=COPR&style=flat-square)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii/builds/)
+[![CI](https://img.shields.io/github/actions/workflow/status/4ster-light/artscii/ci.yml?label=CI&style=flat-square&logo=githubactions&logoColor=white)](https://github.com/4ster-light/artscii/actions/workflows/ci.yml)
+[![COPR build](https://img.shields.io/copr/build/4ster-light/artscii/artscii?label=COPR&style=flat-square&logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/4ster-light/artscii/builds/)
 [![Rust 1.88+](https://img.shields.io/badge/rust-1.88%2B-dea584?logo=rust&logoColor=white&style=flat-square)](https://www.rust-lang.org)
 [![WebAssembly](https://img.shields.io/badge/WebAssembly-Wasm-654FF0?logo=webassembly&logoColor=white&style=flat-square)](crates/artscii-web)
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?logo=githubsponsors&logoColor=white&style=flat-square)](https://github.com/sponsors/4ster-light)
-[![License: MIT](https://img.shields.io/badge/license-MIT-red?style=flat-square)](LICENSE)
-
-</div>
+[![License: GPLv3](https://img.shields.io/badge/license-GPLv3-red?style=flat-square&logo=gnu&logoColor=white)](LICENSE)
 
 ## Table of Contents
 
@@ -473,4 +471,10 @@ cargo build --release
 
 ## License
 
-MIT
+[![License: GPLv3](https://img.shields.io/badge/license-GPLv3-red?style=flat-square&logo=gnu&logoColor=white)](LICENSE)
+
+## Sponsor
+
+Consider sponsoring if you like this proyect:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?logo=githubsponsors&logoColor=white&style=flat-square)](https://github.com/sponsors/4ster-light)
