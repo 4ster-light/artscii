@@ -28,7 +28,7 @@ pub fn play_audio(input: &std::path::Path) -> Result<()> {
         .default_output_device()
         .context("no output audio device available")?;
     let supported = device.default_output_config()?;
-    let config: cpal::StreamConfig = supported.clone().into();
+    let config: cpal::StreamConfig = supported.into();
 
     let mut resampler = ffmpeg::software::resampling::Context::get(
         decoder.format(),
@@ -45,7 +45,7 @@ pub fn play_audio(input: &std::path::Path) -> Result<()> {
         cpal::SampleFormat::F32 => {
             let queue = Arc::clone(&queue);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [f32], _| fill_f32(data, &queue),
                 err_fn,
                 None,
@@ -54,7 +54,7 @@ pub fn play_audio(input: &std::path::Path) -> Result<()> {
         cpal::SampleFormat::I16 => {
             let queue = Arc::clone(&queue);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [i16], _| fill_i16(data, &queue),
                 err_fn,
                 None,
@@ -63,7 +63,7 @@ pub fn play_audio(input: &std::path::Path) -> Result<()> {
         cpal::SampleFormat::U16 => {
             let queue = Arc::clone(&queue);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [u16], _| fill_u16(data, &queue),
                 err_fn,
                 None,
