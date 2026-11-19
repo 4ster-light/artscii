@@ -1,13 +1,14 @@
 name: CI
 
+# PRs and merge queue entries are the gate. Direct pushes to main do not
+# re-run CI, so a validated PR does not duplicate the full check.
 on:
-  push:
-    branches: [main]
   pull_request:
+  merge_group:
   workflow_dispatch:
 
-# Superseded runs on the same PR are pointless; pushes to main are kept so
-# every commit on the default branch gets a green/red result.
+# Superseded runs on the same PR are cancelled; merge queue entries keep
+# their result, they are the pre-merge record.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
